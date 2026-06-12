@@ -1,0 +1,10 @@
+.terraform/
+*.tfstate
+*.tfstate.backup
+.terraform.lock.hcl
+*.tfvars
+*.tfvars.json
+*.pem
+*.key
+.DS_Store
+EOF 
