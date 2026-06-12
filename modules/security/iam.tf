@@ -127,7 +127,6 @@ resource "aws_iam_instance_profile" "app" {
   name = "${local.name_prefix}-app"
   role = aws_iam_role.app.name
 
-  tags = merge(local.common_tags, {
-    Name = "${local.name_prefix}-app-profile"
-  })
+#  tags = merge(local.common_tags, {
+#    Name = "${local.name_prefix}-app-profile" })
 }
