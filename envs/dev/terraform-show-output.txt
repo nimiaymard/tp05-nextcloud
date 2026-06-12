@@ -1,0 +1,2810 @@
+# aws_iam_role_policy.app_s3_real:
+resource "aws_iam_role_policy" "app_s3_real" {
+    id     = "nextcloud-dev-app:nextcloud-dev-app-s3-real"
+    name   = "nextcloud-dev-app-s3-real"
+    policy = jsonencode(
+        {
+            Statement = [
+                {
+                    Action   = [
+                        "s3:GetObject",
+                        "s3:PutObject",
+                        "s3:DeleteObject",
+                        "s3:GetObjectVersion",
+                        "s3:AbortMultipartUpload",
+                    ]
+                    Effect   = "Allow"
+                    Resource = "arn:aws:s3:::nextcloud-dev-primary-039497794217-real-unicorn/*"
+                    Sid      = "NextcloudS3Objects"
+                },
+                {
+                    Action   = [
+                        "s3:ListBucket",
+                        "s3:GetBucketLocation",
+                        "s3:ListBucketMultipartUploads",
+                    ]
+                    Effect   = "Allow"
+                    Resource = "arn:aws:s3:::nextcloud-dev-primary-039497794217-real-unicorn"
+                    Sid      = "NextcloudS3Bucket"
+                },
+            ]
+            Version   = "2012-10-17"
+        }
+    )
+    role   = "nextcloud-dev-app"
+}
+
+
+# module.compute.data.aws_ami.al2023:
+data "aws_ami" "al2023" {
+    architecture          = "x86_64"
+    arn                   = "arn:aws:ec2:eu-west-3::image/ami-05c7dad630d8ce6e5"
+    block_device_mappings = [
+        {
+            device_name  = "/dev/xvda"
+            ebs          = {
+                "delete_on_termination"      = "true"
+                "encrypted"                  = "false"
+                "iops"                       = "3000"
+                "snapshot_id"                = "snap-046e78e8d4735bf82"
+                "throughput"                 = "125"
+                "volume_initialization_rate" = "0"
+                "volume_size"                = "30"
+                "volume_type"                = "gp3"
+            }
+            no_device    = ""
+            virtual_name = ""
+        },
+    ]
+    boot_mode             = "uefi-preferred"
+    creation_date         = "2026-06-09T22:46:33.000Z"
+    deprecation_time      = "2028-06-09T22:46:33.000Z"
+    description           = "Amazon Linux AMI 2023.0.20260609 x86_64 ECS HVM EBS"
+    ena_support           = true
+    hypervisor            = "xen"
+    id                    = "ami-05c7dad630d8ce6e5"
+    image_id              = "ami-05c7dad630d8ce6e5"
+    image_location        = "amazon/al2023-ami-ecs-hvm-2023.0.20260609-kernel-6.1-x86_64"
+    image_owner_alias     = "amazon"
+    image_type            = "machine"
+    imds_support          = "v2.0"
+    include_deprecated    = false
+    most_recent           = true
+    name                  = "al2023-ami-ecs-hvm-2023.0.20260609-kernel-6.1-x86_64"
+    owner_id              = "591542846629"
+    owners                = [
+        "amazon",
+    ]
+    platform_details      = "Linux/UNIX"
+    product_codes         = []
+    public                = true
+    root_device_name      = "/dev/xvda"
+    root_device_type      = "ebs"
+    root_snapshot_id      = "snap-046e78e8d4735bf82"
+    sriov_net_support     = "simple"
+    state                 = "available"
+    state_reason          = {
+        "code"    = "UNSET"
+        "message" = "UNSET"
+    }
+    tags                  = {}
+    usage_operation       = "RunInstances"
+    virtualization_type   = "hvm"
+
+    filter {
+        name   = "architecture"
+        values = [
+            "x86_64",
+        ]
+    }
+    filter {
+        name   = "name"
+        values = [
+            "al2023-ami-*-x86_64",
+        ]
+    }
+    filter {
+        name   = "state"
+        values = [
+            "available",
+        ]
+    }
+}
+
+# module.compute.aws_acm_certificate.self_signed:
+resource "aws_acm_certificate" "self_signed" {
+    arn                       = "arn:aws:acm:eu-west-3:039497794217:certificate/f5e313d8-e879-426d-97bd-2f2df8164227"
+    certificate_body          = <<-EOT
+        -----BEGIN CERTIFICATE-----
+        MIIDozCCAougAwIBAgIQUG9rSnZEVxI7idU906bpyjANBgkqhkiG9w0BAQsFADBE
+        MR4wHAYDVQQKExVLb2xhYiBDYWJpbmV0IEF2b2NhdHMxIjAgBgNVBAMTGW5leHRj
+        bG91ZC1kZXYua29sYWIubG9jYWwwHhcNMjYwNjEyMTIwOTI2WhcNMjgwNjExMTIw
+        OTI2WjBEMR4wHAYDVQQKExVLb2xhYiBDYWJpbmV0IEF2b2NhdHMxIjAgBgNVBAMT
+        GW5leHRjbG91ZC1kZXYua29sYWIubG9jYWwwggEiMA0GCSqGSIb3DQEBAQUAA4IB
+        DwAwggEKAoIBAQChiF3qOB0Zak2wXphGYq/gKsvtLzDiI1qt1Nsgg2o6IZn977Kz
+        z8PBt4qtn1YAxdSgcWT7qPkxPvSyWXWJBEhRuSZosiRwrtcULV+B9Y8uI/Cy+VzJ
+        q6TuwZrvN4YW2uaVdRRWwDSUS3LfrD0QLWDnNI3tHu2/0ya5j183n+ElOn+6mNSc
+        cBlh4Rv4hFY4eL2EweroO+Rgor7OTOtwoFSIZKRFT7yYX2dB34msHP5jWwXzWvqs
+        xRBuvUQXxFeO5vHs+k/Qe013Sm+uPmc6Xrp4m4InjMbVljg8d0FxagODsxyDLDk2
+        lRPNfEeEUjcRXpPTLy/LEWHGA70cHnno3n/LAgMBAAGjgZAwgY0wDgYDVR0PAQH/
+        BAQDAgWgMBMGA1UdJQQMMAoGCCsGAQUFBwMBMAwGA1UdEwEB/wQCMAAwWAYDVR0R
+        BFEwT4IZbmV4dGNsb3VkLWRldi5rb2xhYi5sb2NhbIITKi5lbGIuYW1hem9uYXdz
+        LmNvbYIdKi5ldS13ZXN0LTMuZWxiLmFtYXpvbmF3cy5jb20wDQYJKoZIhvcNAQEL
+        BQADggEBAAjyjwAA3AZLaRtMvoBs7k2RZuJxMzkjfwg0bz+4HvQWLOsyuL5ExowX
+        TYZWLrBxekE0hYw/cmMv1moyfaMoMqlIxAzQNjsk4IKAIRjeCRz3sGxn5Yw8T9b0
+        cNMF5luzIzreEh356AL82lwzJevBv0NQxffXyt6ZTYatuBmgeNX/cW1PqPQ6iWrw
+        k/EJgdj04e7eAKXpyIicg6lkEjM+JOBYCRJmOmn3QW2GOhjoMlg98kXdBBLRO6lH
+        5zSd71/fDHy5HvpggIq3/LrE8/UbVmblJ3/wMOIMo0bE+geiUmlUbKsAJxlSfpr6
+        cEV4EpdeO3aNy5tveL61S0LsmKGa/0I=
+        -----END CERTIFICATE-----
+    EOT
+    domain_name               = "nextcloud-dev.kolab.local"
+    domain_validation_options = []
+    id                        = "arn:aws:acm:eu-west-3:039497794217:certificate/f5e313d8-e879-426d-97bd-2f2df8164227"
+    key_algorithm             = "RSA_2048"
+    not_after                 = "2028-06-11T12:09:26Z"
+    not_before                = "2026-06-12T12:09:26Z"
+    pending_renewal           = false
+    private_key               = (sensitive value)
+    renewal_eligibility       = "INELIGIBLE"
+    renewal_summary           = []
+    status                    = "ISSUED"
+    subject_alternative_names = [
+        "*.elb.amazonaws.com",
+        "*.eu-west-3.elb.amazonaws.com",
+        "nextcloud-dev.kolab.local",
+    ]
+    tags                      = {
+        "Environment" = "dev"
+        "ManagedBy"   = "terraform"
+        "Module"      = "compute"
+        "Name"        = "nextcloud-dev-alb-cert"
+        "Owner"       = "etudiant21"
+        "Project"     = "nextcloud"
+    }
+    tags_all                  = {
+        "Environment" = "dev"
+        "ManagedBy"   = "terraform"
+        "Module"      = "compute"
+        "Name"        = "nextcloud-dev-alb-cert"
+        "Owner"       = "etudiant21"
+        "Project"     = "nextcloud"
+    }
+    type                      = "IMPORTED"
+    validation_emails         = []
+    validation_method         = "NONE"
+
+    options {
+        certificate_transparency_logging_preference = "DISABLED"
+    }
+}
+
+# module.compute.aws_launch_template.app:
+resource "aws_launch_template" "app" {
+    arn                     = "arn:aws:ec2:eu-west-3:039497794217:launch-template/lt-0c9828377b98c243a"
+    default_version         = 1
+    disable_api_stop        = false
+    disable_api_termination = false
+    id                      = "lt-0c9828377b98c243a"
+    image_id                = "ami-05c7dad630d8ce6e5"
+    instance_type           = "t3.small"
+    latest_version          = 2
+    name                    = "nextcloud-dev-lt-20260612132349011900000001"
+    name_prefix             = "nextcloud-dev-lt-"
+    security_group_names    = []
+    tags                    = {
+        "Environment" = "dev"
+        "ManagedBy"   = "terraform"
+        "Module"      = "compute"
+        "Name"        = "nextcloud-dev-launch-template"
+        "Owner"       = "etudiant21"
+        "Project"     = "nextcloud"
+    }
+    tags_all                = {
+        "Environment" = "dev"
+        "ManagedBy"   = "terraform"
+        "Module"      = "compute"
+        "Name"        = "nextcloud-dev-launch-template"
+        "Owner"       = "etudiant21"
+        "Project"     = "nextcloud"
+    }
+    user_data               = "IyEvYmluL2Jhc2gKIyBTY3JpcHQgZGUgYm9vdCA6IGluc3RhbGxlIERvY2tlciwgbGl0IGxlcyBzZWNyZXRzLCBsYW5jZSBOZXh0Y2xvdWQuCnNldCAtZXV4byBwaXBlZmFpbAoKZXhlYyA+ID4odGVlIC92YXIvbG9nL3VzZXItZGF0YS5sb2cgfCBsb2dnZXIgLXQgdXNlci1kYXRhIC1zIDI+L2Rldi9jb25zb2xlKSAyPiYxCgojIEluc3RhbGxhdGlvbiBEb2NrZXIKZG5mIHVwZGF0ZSAteQpkbmYgaW5zdGFsbCAteSBkb2NrZXIKc3lzdGVtY3RsIGVuYWJsZSAtLW5vdyBkb2NrZXIKdXNlcm1vZCAtYUcgZG9ja2VyIGVjMi11c2VyCgojIEF0dGVudGUgcXVlIFJEUyByZXBvbmRlIChtYXggNSBtaW4pCmZvciBpIGluIHsxLi4zMH07IGRvCiAgaWYgdGltZW91dCAzIGJhc2ggLWMgImNhdCA8IC9kZXYvdGNwL25leHRjbG91ZC1kZXYtbmV4dGNsb3VkLmMxb3l3eTRpY3hsNC5ldS13ZXN0LTMucmRzLmFtYXpvbmF3cy5jb20vNTQzMiIgMj4vZGV2L251bGw7IHRoZW4KICAgIGVjaG8gIlJEUyBPSyIKICAgIGJyZWFrCiAgZmkKICBlY2hvICJSRFMgcGFzIHByZXQsIGVzc2FpICRpLzMwLi4uIgogIHNsZWVwIDEwCmRvbmUKCiMgTGVjdHVyZSBkZXMgbW90cyBkZSBwYXNzZSBkYW5zIFNlY3JldHMgTWFuYWdlciAodmlhIGwnaW5zdGFuY2UgcHJvZmlsZSkKREJfUEFTU1dPUkQ9JChhd3Mgc2VjcmV0c21hbmFnZXIgZ2V0LXNlY3JldC12YWx1ZSBcCiAgLS1yZWdpb24gZXUtd2VzdC0zIFwKICAtLXNlY3JldC1pZCAiYXJuOmF3czpzZWNyZXRzbWFuYWdlcjpldS13ZXN0LTM6MDM5NDk3Nzk0MjE3OnNlY3JldDpuZXh0Y2xvdWQtZGV2L2RiL3Bhc3N3b3JkLTZLdjlhUiIgXAogIC0tcXVlcnkgU2VjcmV0U3RyaW5nIC0tb3V0cHV0IHRleHQpCgpBRE1JTl9QQVNTV09SRD0kKGF3cyBzZWNyZXRzbWFuYWdlciBnZXQtc2VjcmV0LXZhbHVlIFwKICAtLXJlZ2lvbiBldS13ZXN0LTMgXAogIC0tc2VjcmV0LWlkICJhcm46YXdzOnNlY3JldHNtYW5hZ2VyOmV1LXdlc3QtMzowMzk0OTc3OTQyMTc6c2VjcmV0Om5leHRjbG91ZC1kZXYvbmV4dGNsb3VkL2FkbWluLXBhc3N3b3JkLTh0VGtYSiIgXAogIC0tcXVlcnkgU2VjcmV0U3RyaW5nIC0tb3V0cHV0IHRleHQpCgojIExhbmNlbWVudCBkdSBjb250YWluZXIgTmV4dGNsb3VkCmRvY2tlciBwdWxsIG5leHRjbG91ZDozMC1hcGFjaGUKCmRvY2tlciBydW4gLWQgLS1uYW1lIG5leHRjbG91ZCBcCiAgLS1yZXN0YXJ0IGFsd2F5cyBcCiAgLXAgODA6ODAgXAogIC1lIFBPU1RHUkVTX0hPU1Q9Im5leHRjbG91ZC1kZXYtbmV4dGNsb3VkLmMxb3l3eTRpY3hsNC5ldS13ZXN0LTMucmRzLmFtYXpvbmF3cy5jb20iIFwKICAtZSBQT1NUR1JFU19EQj0ibmV4dGNsb3VkIiBcCiAgLWUgUE9TVEdSRVNfVVNFUj0ibmV4dGNsb3VkIiBcCiAgLWUgUE9TVEdSRVNfUEFTU1dPUkQ9IiREQl9QQVNTV09SRCIgXAogIC1lIE5FWFRDTE9VRF9BRE1JTl9VU0VSPWFkbWluIFwKICAtZSBORVhUQ0xPVURfQURNSU5fUEFTU1dPUkQ9IiRBRE1JTl9QQVNTV09SRCIgXAogIC1lIE9CSkVDVFNUT1JFX1MzX0JVQ0tFVD0ibmV4dGNsb3VkLWRldi1wcmltYXJ5LTAzOTQ5Nzc5NDIxNy1yZWFsLXVuaWNvcm4iIFwKICAtZSBPQkpFQ1RTVE9SRV9TM19SRUdJT049ImV1LXdlc3QtMyIgXAogIC1lIE9CSkVDVFNUT1JFX1MzX1VTRVBBVEhfU1RZTEU9ZmFsc2UgXAogIC1lIE9CSkVDVFNUT1JFX1MzX1NTTD10cnVlIFwKICAtZSBPQkpFQ1RTVE9SRV9TM19BVVRPQ1JFQVRFPWZhbHNlIFwKICAtZSBPQkpFQ1RTVE9SRV9TM19VU0VfRUMyX0lBTT10cnVlIFwKICAtZSBORVhUQ0xPVURfVFJVU1RFRF9ET01BSU5TPSIqIiBcCiAgLWUgT1ZFUldSSVRFUFJPVE9DT0w9aHR0cHMgXAogIG5leHRjbG91ZDozMC1hcGFjaGUKCnNsZWVwIDMwCmRvY2tlciBwcwplY2hvICJ1c2VyLWRhdGEgdGVybWluZSIK"
+    vpc_security_group_ids  = [
+        "sg-01fe5e208d95f241a",
+    ]
+
+    block_device_mappings {
+        device_name = "/dev/xvda"
+
+        ebs {
+            delete_on_termination      = "true"
+            encrypted                  = "true"
+            iops                       = 0
+            throughput                 = 0
+            volume_initialization_rate = 0
+            volume_size                = 30
+            volume_type                = "gp3"
+        }
+    }
+
+    iam_instance_profile {
+        name = "nextcloud-dev-app"
+    }
+
+    metadata_options {
+        http_endpoint               = "enabled"
+        http_put_response_hop_limit = 2
+        http_tokens                 = "required"
+        instance_metadata_tags      = "enabled"
+    }
+
+    tag_specifications {
+        resource_type = "instance"
+        tags          = {
+            "Environment" = "dev"
+            "ManagedBy"   = "terraform"
+            "Module"      = "compute"
+            "Name"        = "nextcloud-dev-app"
+            "Owner"       = "etudiant21"
+            "Project"     = "nextcloud"
+            "Role"        = "nextcloud-app"
+        }
+    }
+    tag_specifications {
+        resource_type = "volume"
+        tags          = {
+            "Environment" = "dev"
+            "ManagedBy"   = "terraform"
+            "Module"      = "compute"
+            "Name"        = "nextcloud-dev-app-volume"
+            "Owner"       = "etudiant21"
+            "Project"     = "nextcloud"
+        }
+    }
+}
+
+# module.compute.aws_lb.main:
+resource "aws_lb" "main" {
+    arn                                         = "arn:aws:elasticloadbalancing:eu-west-3:039497794217:loadbalancer/app/nextcloud-dev-alb/c5307ed9c2043a1e"
+    arn_suffix                                  = "app/nextcloud-dev-alb/c5307ed9c2043a1e"
+    client_keep_alive                           = 3600
+    desync_mitigation_mode                      = "defensive"
+    dns_name                                    = "nextcloud-dev-alb-736130625.eu-west-3.elb.amazonaws.com"
+    drop_invalid_header_fields                  = true
+    enable_cross_zone_load_balancing            = true
+    enable_deletion_protection                  = false
+    enable_http2                                = true
+    enable_tls_version_and_cipher_suite_headers = false
+    enable_waf_fail_open                        = false
+    enable_xff_client_port                      = false
+    enable_zonal_shift                          = false
+    id                                          = "arn:aws:elasticloadbalancing:eu-west-3:039497794217:loadbalancer/app/nextcloud-dev-alb/c5307ed9c2043a1e"
+    idle_timeout                                = 60
+    internal                                    = false
+    ip_address_type                             = "ipv4"
+    load_balancer_type                          = "application"
+    name                                        = "nextcloud-dev-alb"
+    preserve_host_header                        = false
+    security_groups                             = [
+        "sg-08036a35c8f3a5323",
+    ]
+    subnets                                     = [
+        "subnet-0e30cb53602764957",
+        "subnet-0ec66bc58c9cd078f",
+    ]
+    tags                                        = {
+        "Environment" = "dev"
+        "ManagedBy"   = "terraform"
+        "Module"      = "compute"
+        "Name"        = "nextcloud-dev-alb"
+        "Owner"       = "etudiant21"
+        "Project"     = "nextcloud"
+    }
+    tags_all                                    = {
+        "Environment" = "dev"
+        "ManagedBy"   = "terraform"
+        "Module"      = "compute"
+        "Name"        = "nextcloud-dev-alb"
+        "Owner"       = "etudiant21"
+        "Project"     = "nextcloud"
+    }
+    vpc_id                                      = "vpc-09aed281b6aa94ced"
+    xff_header_processing_mode                  = "append"
+    zone_id                                     = "Z3Q77PNBQS71R4"
+
+    access_logs {
+        enabled = false
+    }
+
+    connection_logs {
+        enabled = false
+    }
+
+    subnet_mapping {
+        subnet_id = "subnet-0e30cb53602764957"
+    }
+    subnet_mapping {
+        subnet_id = "subnet-0ec66bc58c9cd078f"
+    }
+}
+
+# module.compute.aws_lb_listener.http_redirect:
+resource "aws_lb_listener" "http_redirect" {
+    arn                                  = "arn:aws:elasticloadbalancing:eu-west-3:039497794217:listener/app/nextcloud-dev-alb/c5307ed9c2043a1e/ec9704d8e7380868"
+    id                                   = "arn:aws:elasticloadbalancing:eu-west-3:039497794217:listener/app/nextcloud-dev-alb/c5307ed9c2043a1e/ec9704d8e7380868"
+    load_balancer_arn                    = "arn:aws:elasticloadbalancing:eu-west-3:039497794217:loadbalancer/app/nextcloud-dev-alb/c5307ed9c2043a1e"
+    port                                 = 80
+    protocol                             = "HTTP"
+    routing_http_response_server_enabled = true
+    tags                                 = {
+        "Environment" = "dev"
+        "ManagedBy"   = "terraform"
+        "Module"      = "compute"
+        "Owner"       = "etudiant21"
+        "Project"     = "nextcloud"
+    }
+    tags_all                             = {
+        "Environment" = "dev"
+        "ManagedBy"   = "terraform"
+        "Module"      = "compute"
+        "Owner"       = "etudiant21"
+        "Project"     = "nextcloud"
+    }
+
+    default_action {
+        order = 1
+        type  = "redirect"
+
+        redirect {
+            host        = "#{host}"
+            path        = "/#{path}"
+            port        = "443"
+            protocol    = "HTTPS"
+            query       = "#{query}"
+            status_code = "HTTP_301"
+        }
+    }
+}
+
+# module.compute.aws_lb_listener.https:
+resource "aws_lb_listener" "https" {
+    arn                                  = "arn:aws:elasticloadbalancing:eu-west-3:039497794217:listener/app/nextcloud-dev-alb/c5307ed9c2043a1e/b6bfc022b1d7b9d3"
+    certificate_arn                      = "arn:aws:acm:eu-west-3:039497794217:certificate/f5e313d8-e879-426d-97bd-2f2df8164227"
+    id                                   = "arn:aws:elasticloadbalancing:eu-west-3:039497794217:listener/app/nextcloud-dev-alb/c5307ed9c2043a1e/b6bfc022b1d7b9d3"
+    load_balancer_arn                    = "arn:aws:elasticloadbalancing:eu-west-3:039497794217:loadbalancer/app/nextcloud-dev-alb/c5307ed9c2043a1e"
+    port                                 = 443
+    protocol                             = "HTTPS"
+    routing_http_response_server_enabled = true
+    ssl_policy                           = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+    tags                                 = {
+        "Environment" = "dev"
+        "ManagedBy"   = "terraform"
+        "Module"      = "compute"
+        "Owner"       = "etudiant21"
+        "Project"     = "nextcloud"
+    }
+    tags_all                             = {
+        "Environment" = "dev"
+        "ManagedBy"   = "terraform"
+        "Module"      = "compute"
+        "Owner"       = "etudiant21"
+        "Project"     = "nextcloud"
+    }
+
+    default_action {
+        order            = 1
+        target_group_arn = "arn:aws:elasticloadbalancing:eu-west-3:039497794217:targetgroup/nextcloud-dev-tg/b78c853a3cbed7e8"
+        type             = "forward"
+    }
+
+    mutual_authentication {
+        ignore_client_certificate_expiry = false
+        mode                             = "off"
+    }
+}
+
+# module.compute.aws_lb_target_group.app:
+resource "aws_lb_target_group" "app" {
+    arn                                = "arn:aws:elasticloadbalancing:eu-west-3:039497794217:targetgroup/nextcloud-dev-tg/b78c853a3cbed7e8"
+    arn_suffix                         = "targetgroup/nextcloud-dev-tg/b78c853a3cbed7e8"
+    deregistration_delay               = "30"
+    id                                 = "arn:aws:elasticloadbalancing:eu-west-3:039497794217:targetgroup/nextcloud-dev-tg/b78c853a3cbed7e8"
+    ip_address_type                    = "ipv4"
+    lambda_multi_value_headers_enabled = false
+    load_balancer_arns                 = [
+        "arn:aws:elasticloadbalancing:eu-west-3:039497794217:loadbalancer/app/nextcloud-dev-alb/c5307ed9c2043a1e",
+    ]
+    load_balancing_algorithm_type      = "round_robin"
+    load_balancing_anomaly_mitigation  = "off"
+    load_balancing_cross_zone_enabled  = "use_load_balancer_configuration"
+    name                               = "nextcloud-dev-tg"
+    port                               = 80
+    protocol                           = "HTTP"
+    protocol_version                   = "HTTP1"
+    proxy_protocol_v2                  = false
+    slow_start                         = 0
+    tags                               = {
+        "Environment" = "dev"
+        "ManagedBy"   = "terraform"
+        "Module"      = "compute"
+        "Name"        = "nextcloud-dev-tg"
+        "Owner"       = "etudiant21"
+        "Project"     = "nextcloud"
+    }
+    tags_all                           = {
+        "Environment" = "dev"
+        "ManagedBy"   = "terraform"
+        "Module"      = "compute"
+        "Name"        = "nextcloud-dev-tg"
+        "Owner"       = "etudiant21"
+        "Project"     = "nextcloud"
+    }
+    target_type                        = "instance"
+    vpc_id                             = "vpc-09aed281b6aa94ced"
+
+    health_check {
+        enabled             = true
+        healthy_threshold   = 2
+        interval            = 30
+        matcher             = "200"
+        path                = "/status.php"
+        port                = "traffic-port"
+        protocol            = "HTTP"
+        timeout             = 10
+        unhealthy_threshold = 3
+    }
+
+    stickiness {
+        cookie_duration = 86400
+        enabled         = false
+        type            = "lb_cookie"
+    }
+
+    target_failover {}
+
+    target_group_health {
+        dns_failover {
+            minimum_healthy_targets_count      = "1"
+            minimum_healthy_targets_percentage = "off"
+        }
+        unhealthy_state_routing {
+            minimum_healthy_targets_count      = 1
+            minimum_healthy_targets_percentage = "off"
+        }
+    }
+
+    target_health_state {}
+}
+
+# module.compute.tls_private_key.self_signed:
+resource "tls_private_key" "self_signed" {
+    algorithm                     = "RSA"
+    ecdsa_curve                   = "P224"
+    id                            = "f044bbb1ee96033cc944f2b67429ffd4474adde6"
+    private_key_openssh           = (sensitive value)
+    private_key_pem               = (sensitive value)
+    private_key_pem_pkcs8         = (sensitive value)
+    public_key_fingerprint_md5    = "a1:73:bb:1e:3c:19:33:73:8b:6d:09:82:e5:35:c0:d4"
+    public_key_fingerprint_sha256 = "SHA256:Yr2FpZI96x9m7ZSCJO85x0VHpIzQWf3Q8UE2jhRkZcc"
+    public_key_openssh            = <<-EOT
+        ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQChiF3qOB0Zak2wXphGYq/gKsvtLzDiI1qt1Nsgg2o6IZn977Kzz8PBt4qtn1YAxdSgcWT7qPkxPvSyWXWJBEhRuSZosiRwrtcULV+B9Y8uI/Cy+VzJq6TuwZrvN4YW2uaVdRRWwDSUS3LfrD0QLWDnNI3tHu2/0ya5j183n+ElOn+6mNSccBlh4Rv4hFY4eL2EweroO+Rgor7OTOtwoFSIZKRFT7yYX2dB34msHP5jWwXzWvqsxRBuvUQXxFeO5vHs+k/Qe013Sm+uPmc6Xrp4m4InjMbVljg8d0FxagODsxyDLDk2lRPNfEeEUjcRXpPTLy/LEWHGA70cHnno3n/L
+    EOT
+    public_key_pem                = <<-EOT
+        -----BEGIN PUBLIC KEY-----
+        MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoYhd6jgdGWpNsF6YRmKv
+        4CrL7S8w4iNardTbIINqOiGZ/e+ys8/DwbeKrZ9WAMXUoHFk+6j5MT70sll1iQRI
+        UbkmaLIkcK7XFC1fgfWPLiPwsvlcyauk7sGa7zeGFtrmlXUUVsA0lEty36w9EC1g
+        5zSN7R7tv9MmuY9fN5/hJTp/upjUnHAZYeEb+IRWOHi9hMHq6DvkYKK+zkzrcKBU
+        iGSkRU+8mF9nQd+JrBz+Y1sF81r6rMUQbr1EF8RXjubx7PpP0HtNd0pvrj5nOl66
+        eJuCJ4zG1ZY4PHdBcWoDg7Mcgyw5NpUTzXxHhFI3EV6T0y8vyxFhxgO9HB556N5/
+        ywIDAQAB
+        -----END PUBLIC KEY-----
+    EOT
+    rsa_bits                      = 2048
+}
+
+# module.compute.tls_self_signed_cert.alb:
+resource "tls_self_signed_cert" "alb" {
+    allowed_uses          = [
+        "key_encipherment",
+        "digital_signature",
+        "server_auth",
+    ]
+    cert_pem              = <<-EOT
+        -----BEGIN CERTIFICATE-----
+        MIIDozCCAougAwIBAgIQUG9rSnZEVxI7idU906bpyjANBgkqhkiG9w0BAQsFADBE
+        MR4wHAYDVQQKExVLb2xhYiBDYWJpbmV0IEF2b2NhdHMxIjAgBgNVBAMTGW5leHRj
+        bG91ZC1kZXYua29sYWIubG9jYWwwHhcNMjYwNjEyMTIwOTI2WhcNMjgwNjExMTIw
+        OTI2WjBEMR4wHAYDVQQKExVLb2xhYiBDYWJpbmV0IEF2b2NhdHMxIjAgBgNVBAMT
+        GW5leHRjbG91ZC1kZXYua29sYWIubG9jYWwwggEiMA0GCSqGSIb3DQEBAQUAA4IB
+        DwAwggEKAoIBAQChiF3qOB0Zak2wXphGYq/gKsvtLzDiI1qt1Nsgg2o6IZn977Kz
+        z8PBt4qtn1YAxdSgcWT7qPkxPvSyWXWJBEhRuSZosiRwrtcULV+B9Y8uI/Cy+VzJ
+        q6TuwZrvN4YW2uaVdRRWwDSUS3LfrD0QLWDnNI3tHu2/0ya5j183n+ElOn+6mNSc
+        cBlh4Rv4hFY4eL2EweroO+Rgor7OTOtwoFSIZKRFT7yYX2dB34msHP5jWwXzWvqs
+        xRBuvUQXxFeO5vHs+k/Qe013Sm+uPmc6Xrp4m4InjMbVljg8d0FxagODsxyDLDk2
+        lRPNfEeEUjcRXpPTLy/LEWHGA70cHnno3n/LAgMBAAGjgZAwgY0wDgYDVR0PAQH/
+        BAQDAgWgMBMGA1UdJQQMMAoGCCsGAQUFBwMBMAwGA1UdEwEB/wQCMAAwWAYDVR0R
+        BFEwT4IZbmV4dGNsb3VkLWRldi5rb2xhYi5sb2NhbIITKi5lbGIuYW1hem9uYXdz
+        LmNvbYIdKi5ldS13ZXN0LTMuZWxiLmFtYXpvbmF3cy5jb20wDQYJKoZIhvcNAQEL
+        BQADggEBAAjyjwAA3AZLaRtMvoBs7k2RZuJxMzkjfwg0bz+4HvQWLOsyuL5ExowX
+        TYZWLrBxekE0hYw/cmMv1moyfaMoMqlIxAzQNjsk4IKAIRjeCRz3sGxn5Yw8T9b0
+        cNMF5luzIzreEh356AL82lwzJevBv0NQxffXyt6ZTYatuBmgeNX/cW1PqPQ6iWrw
+        k/EJgdj04e7eAKXpyIicg6lkEjM+JOBYCRJmOmn3QW2GOhjoMlg98kXdBBLRO6lH
+        5zSd71/fDHy5HvpggIq3/LrE8/UbVmblJ3/wMOIMo0bE+geiUmlUbKsAJxlSfpr6
+        cEV4EpdeO3aNy5tveL61S0LsmKGa/0I=
+        -----END CERTIFICATE-----
+    EOT
+    dns_names             = [
+        "nextcloud-dev.kolab.local",
+        "*.elb.amazonaws.com",
+        "*.eu-west-3.elb.amazonaws.com",
+    ]
+    early_renewal_hours   = 0
+    id                    = "106916760731404101780235904653988391370"
+    is_ca_certificate     = false
+    key_algorithm         = "RSA"
+    private_key_pem       = (sensitive value)
+    ready_for_renewal     = false
+    set_authority_key_id  = false
+    set_subject_key_id    = false
+    validity_end_time     = "2028-06-11T14:09:26.505812165+02:00"
+    validity_period_hours = 17520
+    validity_start_time   = "2026-06-12T14:09:26.505812165+02:00"
+
+    subject {
+        common_name  = "nextcloud-dev.kolab.local"
+        organization = "Kolab Cabinet Avocats"
+    }
+}
+
+
+# module.data.data.aws_caller_identity.current:
+data "aws_caller_identity" "current" {
+    account_id = "039497794217"
+    arn        = "arn:aws:iam::039497794217:user/etudiant02"
+    id         = "039497794217"
+    user_id    = "AIDAQSMSAQKU5NOCSA3E3"
+}
+
+# module.data.data.aws_elb_service_account.main:
+data "aws_elb_service_account" "main" {
+    arn = "arn:aws:iam::009996457667:root"
+    id  = "009996457667"
+}
+
+# module.data.data.aws_iam_policy_document.logs:
+data "aws_iam_policy_document" "logs" {
+    id            = "1527957499"
+    json          = jsonencode(
+        {
+            Statement = [
+                {
+                    Action    = "s3:PutObject"
+                    Effect    = "Allow"
+                    Principal = {
+                        AWS = "arn:aws:iam::009996457667:root"
+                    }
+                    Resource  = "arn:aws:s3:::nextcloud-dev-alb-logs-039497794217-real-unicorn/alb/AWSLogs/039497794217/*"
+                    Sid       = "AllowELBAccessLogs"
+                },
+                {
+                    Action    = "s3:*"
+                    Condition = {
+                        Bool = {
+                            "aws:SecureTransport" = "false"
+                        }
+                    }
+                    Effect    = "Deny"
+                    Principal = "*"
+                    Resource  = [
+                        "arn:aws:s3:::nextcloud-dev-alb-logs-039497794217-real-unicorn/*",
+                        "arn:aws:s3:::nextcloud-dev-alb-logs-039497794217-real-unicorn",
+                    ]
+                    Sid       = "DenyInsecureTransport"
+                },
+            ]
+            Version   = "2012-10-17"
+        }
+    )
+    minified_json = jsonencode(
+        {
+            Statement = [
+                {
+                    Action    = "s3:PutObject"
+                    Effect    = "Allow"
+                    Principal = {
+                        AWS = "arn:aws:iam::009996457667:root"
+                    }
+                    Resource  = "arn:aws:s3:::nextcloud-dev-alb-logs-039497794217-real-unicorn/alb/AWSLogs/039497794217/*"
+                    Sid       = "AllowELBAccessLogs"
+                },
+                {
+                    Action    = "s3:*"
+                    Condition = {
+                        Bool = {
+                            "aws:SecureTransport" = "false"
+                        }
+                    }
+                    Effect    = "Deny"
+                    Principal = "*"
+                    Resource  = [
+                        "arn:aws:s3:::nextcloud-dev-alb-logs-039497794217-real-unicorn/*",
+                        "arn:aws:s3:::nextcloud-dev-alb-logs-039497794217-real-unicorn",
+                    ]
+                    Sid       = "DenyInsecureTransport"
+                },
+            ]
+            Version   = "2012-10-17"
+        }
+    )
+    version       = "2012-10-17"
+
+    statement {
+        actions       = [
+            "s3:PutObject",
+        ]
+        effect        = "Allow"
+        not_actions   = []
+        not_resources = []
+        resources     = [
+            "arn:aws:s3:::nextcloud-dev-alb-logs-039497794217-real-unicorn/alb/AWSLogs/039497794217/*",
+        ]
+        sid           = "AllowELBAccessLogs"
+
+        principals {
+            identifiers = [
+                "arn:aws:iam::009996457667:root",
+            ]
+            type        = "AWS"
+        }
+    }
+    statement {
+        actions       = [
+            "s3:*",
+        ]
+        effect        = "Deny"
+        not_actions   = []
+        not_resources = []
+        resources     = [
+            "arn:aws:s3:::nextcloud-dev-alb-logs-039497794217-real-unicorn",
+            "arn:aws:s3:::nextcloud-dev-alb-logs-039497794217-real-unicorn/*",
+        ]
+        sid           = "DenyInsecureTransport"
+
+        condition {
+            test     = "Bool"
+            values   = [
+                "false",
+            ]
+            variable = "aws:SecureTransport"
+        }
+
+        principals {
+            identifiers = [
+                "*",
+            ]
+            type        = "*"
+        }
+    }
+}
+
+# module.data.data.aws_iam_policy_document.primary_deny_insecure:
+data "aws_iam_policy_document" "primary_deny_insecure" {
+    id            = "255826291"
+    json          = jsonencode(
+        {
+            Statement = [
+                {
+                    Action    = "s3:*"
+                    Condition = {
+                        Bool = {
+                            "aws:SecureTransport" = "false"
+                        }
+                    }
+                    Effect    = "Deny"
+                    Principal = "*"
+                    Resource  = [
+                        "arn:aws:s3:::nextcloud-dev-primary-039497794217-real-unicorn/*",
+                        "arn:aws:s3:::nextcloud-dev-primary-039497794217-real-unicorn",
+                    ]
+                    Sid       = "DenyInsecureTransport"
+                },
+            ]
+            Version   = "2012-10-17"
+        }
+    )
+    minified_json = jsonencode(
+        {
+            Statement = [
+                {
+                    Action    = "s3:*"
+                    Condition = {
+                        Bool = {
+                            "aws:SecureTransport" = "false"
+                        }
+                    }
+                    Effect    = "Deny"
+                    Principal = "*"
+                    Resource  = [
+                        "arn:aws:s3:::nextcloud-dev-primary-039497794217-real-unicorn/*",
+                        "arn:aws:s3:::nextcloud-dev-primary-039497794217-real-unicorn",
+                    ]
+                    Sid       = "DenyInsecureTransport"
+                },
+            ]
+            Version   = "2012-10-17"
+        }
+    )
+    version       = "2012-10-17"
+
+    statement {
+        actions       = [
+            "s3:*",
+        ]
+        effect        = "Deny"
+        not_actions   = []
+        not_resources = []
+        resources     = [
+            "arn:aws:s3:::nextcloud-dev-primary-039497794217-real-unicorn",
+            "arn:aws:s3:::nextcloud-dev-primary-039497794217-real-unicorn/*",
+        ]
+        sid           = "DenyInsecureTransport"
+
+        condition {
+            test     = "Bool"
+            values   = [
+                "false",
+            ]
+            variable = "aws:SecureTransport"
+        }
+
+        principals {
+            identifiers = [
+                "*",
+            ]
+            type        = "*"
+        }
+    }
+}
+
+# module.data.data.aws_secretsmanager_secret_version.db_password:
+data "aws_secretsmanager_secret_version" "db_password" {
+    arn            = "arn:aws:secretsmanager:eu-west-3:039497794217:secret:nextcloud-dev/db/password-6Kv9aR"
+    created_date   = "2026-06-12T12:09:50Z"
+    id             = "arn:aws:secretsmanager:eu-west-3:039497794217:secret:nextcloud-dev/db/password-6Kv9aR|AWSCURRENT"
+    secret_id      = "arn:aws:secretsmanager:eu-west-3:039497794217:secret:nextcloud-dev/db/password-6Kv9aR"
+    secret_string  = (sensitive value)
+    version_id     = "terraform-20260612120950257200000007"
+    version_stage  = "AWSCURRENT"
+    version_stages = [
+        "AWSCURRENT",
+    ]
+}
+
+# module.data.aws_db_instance.nextcloud:
+resource "aws_db_instance" "nextcloud" {
+    address                               = "nextcloud-dev-nextcloud.c1oywy4icxl4.eu-west-3.rds.amazonaws.com"
+    allocated_storage                     = 20
+    apply_immediately                     = false
+    arn                                   = "arn:aws:rds:eu-west-3:039497794217:db:nextcloud-dev-nextcloud"
+    auto_minor_version_upgrade            = true
+    availability_zone                     = "eu-west-3a"
+    backup_retention_period               = 7
+    backup_target                         = "region"
+    backup_window                         = "03:00-04:00"
+    ca_cert_identifier                    = "rds-ca-rsa2048-g1"
+    copy_tags_to_snapshot                 = false
+    customer_owned_ip_enabled             = false
+    database_insights_mode                = "standard"
+    db_name                               = "nextcloud"
+    db_subnet_group_name                  = "nextcloud-dev-db-subnets"
+    dedicated_log_volume                  = false
+    delete_automated_backups              = true
+    deletion_protection                   = false
+    domain_dns_ips                        = []
+    enabled_cloudwatch_logs_exports       = [
+        "postgresql",
+        "upgrade",
+    ]
+    endpoint                              = "nextcloud-dev-nextcloud.c1oywy4icxl4.eu-west-3.rds.amazonaws.com:5432"
+    engine                                = "postgres"
+    engine_lifecycle_support              = "open-source-rds-extended-support"
+    engine_version                        = "16.9"
+    engine_version_actual                 = "16.9"
+    hosted_zone_id                        = "ZMESEXB7ZGGQ3"
+    iam_database_authentication_enabled   = true
+    id                                    = "db-TGBWMWXCZL5RWC7SDDJWARAM4M"
+    identifier                            = "nextcloud-dev-nextcloud"
+    instance_class                        = "db.t3.micro"
+    iops                                  = 3000
+    kms_key_id                            = "arn:aws:kms:eu-west-3:039497794217:key/c5442131-30be-4cf8-a017-30848a555274"
+    latest_restorable_time                = "2026-06-12T13:19:15Z"
+    license_model                         = "postgresql-license"
+    listener_endpoint                     = []
+    maintenance_window                    = "sun:04:00-sun:05:00"
+    master_user_secret                    = []
+    max_allocated_storage                 = 100
+    monitoring_interval                   = 0
+    multi_az                              = true
+    network_type                          = "IPV4"
+    option_group_name                     = "default:postgres-16"
+    parameter_group_name                  = "nextcloud-dev-pg16"
+    password                              = (sensitive value)
+    performance_insights_enabled          = true
+    performance_insights_kms_key_id       = "arn:aws:kms:eu-west-3:039497794217:key/c5442131-30be-4cf8-a017-30848a555274"
+    performance_insights_retention_period = 7
+    port                                  = 5432
+    publicly_accessible                   = false
+    replicas                              = []
+    resource_id                           = "db-TGBWMWXCZL5RWC7SDDJWARAM4M"
+    skip_final_snapshot                   = true
+    status                                = "available"
+    storage_encrypted                     = true
+    storage_throughput                    = 125
+    storage_type                          = "gp3"
+    tags                                  = {
+        "Environment" = "dev"
+        "ManagedBy"   = "terraform"
+        "Module"      = "data"
+        "Name"        = "nextcloud-dev-nextcloud-rds"
+        "Project"     = "nextcloud"
+    }
+    tags_all                              = {
+        "Environment" = "dev"
+        "ManagedBy"   = "terraform"
+        "Module"      = "data"
+        "Name"        = "nextcloud-dev-nextcloud-rds"
+        "Project"     = "nextcloud"
+    }
+    username                              = "nextcloud"
+    vpc_security_group_ids                = [
+        "sg-05e97be300ccdb875",
+    ]
+}
+
+# module.data.aws_db_parameter_group.nextcloud:
+resource "aws_db_parameter_group" "nextcloud" {
+    arn          = "arn:aws:rds:eu-west-3:039497794217:pg:nextcloud-dev-pg16"
+    description  = "Managed by Terraform"
+    family       = "postgres16"
+    id           = "nextcloud-dev-pg16"
+    name         = "nextcloud-dev-pg16"
+    skip_destroy = false
+    tags         = {
+        "Environment" = "dev"
+        "ManagedBy"   = "terraform"
+        "Module"      = "data"
+        "Name"        = "nextcloud-dev-pg16-params"
+        "Project"     = "nextcloud"
+    }
+    tags_all     = {
+        "Environment" = "dev"
+        "ManagedBy"   = "terraform"
+        "Module"      = "data"
+        "Name"        = "nextcloud-dev-pg16-params"
+        "Project"     = "nextcloud"
+    }
+
+    parameter {
+        apply_method = "immediate"
+        name         = "log_connections"
+        value        = "1"
+    }
+    parameter {
+        apply_method = "immediate"
+        name         = "log_disconnections"
+        value        = "1"
+    }
+    parameter {
+        apply_method = "immediate"
+        name         = "log_statement"
+        value        = "ddl"
+    }
+    parameter {
+        apply_method = "immediate"
+        name         = "rds.force_ssl"
+        value        = "1"
+    }
+}
+
+# module.data.aws_db_subnet_group.nextcloud:
+resource "aws_db_subnet_group" "nextcloud" {
+    arn                     = "arn:aws:rds:eu-west-3:039497794217:subgrp:nextcloud-dev-db-subnets"
+    description             = "Managed by Terraform"
+    id                      = "nextcloud-dev-db-subnets"
+    name                    = "nextcloud-dev-db-subnets"
+    subnet_ids              = [
+        "subnet-0322d61ef73fa74bb",
+        "subnet-03c8c4b21491162ca",
+    ]
+    supported_network_types = [
+        "IPV4",
+    ]
+    tags                    = {
+        "Environment" = "dev"
+        "ManagedBy"   = "terraform"
+        "Module"      = "data"
+        "Name"        = "nextcloud-dev-db-subnets"
+        "Project"     = "nextcloud"
+    }
+    tags_all                = {
+        "Environment" = "dev"
+        "ManagedBy"   = "terraform"
+        "Module"      = "data"
+        "Name"        = "nextcloud-dev-db-subnets"
+        "Project"     = "nextcloud"
+    }
+    vpc_id                  = "vpc-09aed281b6aa94ced"
+}
+
+# module.data.aws_s3_bucket.logs:
+resource "aws_s3_bucket" "logs" {
+    arn                         = "arn:aws:s3:::nextcloud-dev-alb-logs-039497794217-real-unicorn"
+    bucket                      = "nextcloud-dev-alb-logs-039497794217-real-unicorn"
+    bucket_domain_name          = "nextcloud-dev-alb-logs-039497794217-real-unicorn.s3.amazonaws.com"
+    bucket_regional_domain_name = "nextcloud-dev-alb-logs-039497794217-real-unicorn.s3.eu-west-3.amazonaws.com"
+    force_destroy               = true
+    hosted_zone_id              = "Z3R1K369G5AVDG"
+    id                          = "nextcloud-dev-alb-logs-039497794217-real-unicorn"
+    object_lock_enabled         = false
+    policy                      = jsonencode(
+        {
+            Statement = [
+                {
+                    Action    = "s3:PutObject"
+                    Effect    = "Allow"
+                    Principal = {
+                        AWS = "arn:aws:iam::009996457667:root"
+                    }
+                    Resource  = "arn:aws:s3:::nextcloud-dev-alb-logs-039497794217-real-unicorn/alb/AWSLogs/039497794217/*"
+                    Sid       = "AllowELBAccessLogs"
+                },
+                {
+                    Action    = "s3:*"
+                    Condition = {
+                        Bool = {
+                            "aws:SecureTransport" = "false"
+                        }
+                    }
+                    Effect    = "Deny"
+                    Principal = "*"
+                    Resource  = [
+                        "arn:aws:s3:::nextcloud-dev-alb-logs-039497794217-real-unicorn/*",
+                        "arn:aws:s3:::nextcloud-dev-alb-logs-039497794217-real-unicorn",
+                    ]
+                    Sid       = "DenyInsecureTransport"
+                },
+            ]
+            Version   = "2012-10-17"
+        }
+    )
+    region                      = "eu-west-3"
+    request_payer               = "BucketOwner"
+    tags                        = {
+        "Environment" = "dev"
+        "ManagedBy"   = "terraform"
+        "Module"      = "data"
+        "Name"        = "nextcloud-dev-alb-logs-039497794217-real-unicorn"
+        "Project"     = "nextcloud"
+        "Role"        = "alb-access-logs"
+    }
+    tags_all                    = {
+        "Environment" = "dev"
+        "ManagedBy"   = "terraform"
+        "Module"      = "data"
+        "Name"        = "nextcloud-dev-alb-logs-039497794217-real-unicorn"
+        "Project"     = "nextcloud"
+        "Role"        = "alb-access-logs"
+    }
+
+    grant {
+        id          = "00b29fd4232797854f11a3461b7164c597dfad90ed4e152ed5303c01b0c48665"
+        permissions = [
+            "FULL_CONTROL",
+        ]
+        type        = "CanonicalUser"
+    }
+
+    lifecycle_rule {
+        abort_incomplete_multipart_upload_days = 7
+        enabled                                = true
+        id                                     = "alb-logs-lifecycle"
+        prefix                                 = "alb/"
+        tags                                   = {}
+
+        expiration {
+            days                         = 90
+            expired_object_delete_marker = false
+        }
+
+        noncurrent_version_expiration {
+            days = 7
+        }
+
+        transition {
+            days          = 30
+            storage_class = "GLACIER_IR"
+        }
+    }
+
+    server_side_encryption_configuration {
+        rule {
+            bucket_key_enabled = true
+
+            apply_server_side_encryption_by_default {
+                kms_master_key_id = "arn:aws:kms:eu-west-3:039497794217:key/c5442131-30be-4cf8-a017-30848a555274"
+                sse_algorithm     = "aws:kms"
+            }
+        }
+    }
+
+    versioning {
+        enabled    = false
+        mfa_delete = false
+    }
+}
+
+# module.data.aws_s3_bucket.primary:
+resource "aws_s3_bucket" "primary" {
+    arn                         = "arn:aws:s3:::nextcloud-dev-primary-039497794217-real-unicorn"
+    bucket                      = "nextcloud-dev-primary-039497794217-real-unicorn"
+    bucket_domain_name          = "nextcloud-dev-primary-039497794217-real-unicorn.s3.amazonaws.com"
+    bucket_regional_domain_name = "nextcloud-dev-primary-039497794217-real-unicorn.s3.eu-west-3.amazonaws.com"
+    force_destroy               = true
+    hosted_zone_id              = "Z3R1K369G5AVDG"
+    id                          = "nextcloud-dev-primary-039497794217-real-unicorn"
+    object_lock_enabled         = false
+    policy                      = jsonencode(
+        {
+            Statement = [
+                {
+                    Action    = "s3:*"
+                    Condition = {
+                        Bool = {
+                            "aws:SecureTransport" = "false"
+                        }
+                    }
+                    Effect    = "Deny"
+                    Principal = "*"
+                    Resource  = [
+                        "arn:aws:s3:::nextcloud-dev-primary-039497794217-real-unicorn/*",
+                        "arn:aws:s3:::nextcloud-dev-primary-039497794217-real-unicorn",
+                    ]
+                    Sid       = "DenyInsecureTransport"
+                },
+            ]
+            Version   = "2012-10-17"
+        }
+    )
+    region                      = "eu-west-3"
+    request_payer               = "BucketOwner"
+    tags                        = {
+        "Environment" = "dev"
+        "ManagedBy"   = "terraform"
+        "Module"      = "data"
+        "Name"        = "nextcloud-dev-primary-039497794217-real-unicorn"
+        "Project"     = "nextcloud"
+        "Role"        = "nextcloud-primary-storage"
+    }
+    tags_all                    = {
+        "Environment" = "dev"
+        "ManagedBy"   = "terraform"
+        "Module"      = "data"
+        "Name"        = "nextcloud-dev-primary-039497794217-real-unicorn"
+        "Project"     = "nextcloud"
+        "Role"        = "nextcloud-primary-storage"
+    }
+
+    grant {
+        id          = "00b29fd4232797854f11a3461b7164c597dfad90ed4e152ed5303c01b0c48665"
+        permissions = [
+            "FULL_CONTROL",
+        ]
+        type        = "CanonicalUser"
+    }
+
+    server_side_encryption_configuration {
+        rule {
+            bucket_key_enabled = true
+
+            apply_server_side_encryption_by_default {
+                kms_master_key_id = "arn:aws:kms:eu-west-3:039497794217:key/c5442131-30be-4cf8-a017-30848a555274"
+                sse_algorithm     = "aws:kms"
+            }
+        }
+    }
+
+    versioning {
+        enabled    = true
+        mfa_delete = false
+    }
+}
+
+# module.data.aws_s3_bucket_lifecycle_configuration.logs:
+resource "aws_s3_bucket_lifecycle_configuration" "logs" {
+    bucket                                 = "nextcloud-dev-alb-logs-039497794217-real-unicorn"
+    id                                     = "nextcloud-dev-alb-logs-039497794217-real-unicorn"
+    transition_default_minimum_object_size = "all_storage_classes_128K"
+
+    rule {
+        id     = "alb-logs-lifecycle"
+        status = "Enabled"
+
+        abort_incomplete_multipart_upload {
+            days_after_initiation = 7
+        }
+
+        expiration {
+            days                         = 90
+            expired_object_delete_marker = false
+        }
+
+        filter {
+            prefix = "alb/"
+        }
+
+        noncurrent_version_expiration {
+            noncurrent_days = 7
+        }
+
+        transition {
+            days          = 30
+            storage_class = "GLACIER_IR"
+        }
+    }
+}
+
+# module.data.aws_s3_bucket_policy.logs:
+resource "aws_s3_bucket_policy" "logs" {
+    bucket = "nextcloud-dev-alb-logs-039497794217-real-unicorn"
+    id     = "nextcloud-dev-alb-logs-039497794217-real-unicorn"
+    policy = jsonencode(
+        {
+            Statement = [
+                {
+                    Action    = "s3:PutObject"
+                    Effect    = "Allow"
+                    Principal = {
+                        AWS = "arn:aws:iam::009996457667:root"
+                    }
+                    Resource  = "arn:aws:s3:::nextcloud-dev-alb-logs-039497794217-real-unicorn/alb/AWSLogs/039497794217/*"
+                    Sid       = "AllowELBAccessLogs"
+                },
+                {
+                    Action    = "s3:*"
+                    Condition = {
+                        Bool = {
+                            "aws:SecureTransport" = "false"
+                        }
+                    }
+                    Effect    = "Deny"
+                    Principal = "*"
+                    Resource  = [
+                        "arn:aws:s3:::nextcloud-dev-alb-logs-039497794217-real-unicorn/*",
+                        "arn:aws:s3:::nextcloud-dev-alb-logs-039497794217-real-unicorn",
+                    ]
+                    Sid       = "DenyInsecureTransport"
+                },
+            ]
+            Version   = "2012-10-17"
+        }
+    )
+}
+
+# module.data.aws_s3_bucket_policy.primary:
+resource "aws_s3_bucket_policy" "primary" {
+    bucket = "nextcloud-dev-primary-039497794217-real-unicorn"
+    id     = "nextcloud-dev-primary-039497794217-real-unicorn"
+    policy = jsonencode(
+        {
+            Statement = [
+                {
+                    Action    = "s3:*"
+                    Condition = {
+                        Bool = {
+                            "aws:SecureTransport" = "false"
+                        }
+                    }
+                    Effect    = "Deny"
+                    Principal = "*"
+                    Resource  = [
+                        "arn:aws:s3:::nextcloud-dev-primary-039497794217-real-unicorn/*",
+                        "arn:aws:s3:::nextcloud-dev-primary-039497794217-real-unicorn",
+                    ]
+                    Sid       = "DenyInsecureTransport"
+                },
+            ]
+            Version   = "2012-10-17"
+        }
+    )
+}
+
+# module.data.aws_s3_bucket_public_access_block.logs:
+resource "aws_s3_bucket_public_access_block" "logs" {
+    block_public_acls       = true
+    block_public_policy     = true
+    bucket                  = "nextcloud-dev-alb-logs-039497794217-real-unicorn"
+    id                      = "nextcloud-dev-alb-logs-039497794217-real-unicorn"
+    ignore_public_acls      = true
+    restrict_public_buckets = true
+}
+
+# module.data.aws_s3_bucket_public_access_block.primary:
+resource "aws_s3_bucket_public_access_block" "primary" {
+    block_public_acls       = true
+    block_public_policy     = true
+    bucket                  = "nextcloud-dev-primary-039497794217-real-unicorn"
+    id                      = "nextcloud-dev-primary-039497794217-real-unicorn"
+    ignore_public_acls      = true
+    restrict_public_buckets = true
+}
+
+# module.data.aws_s3_bucket_server_side_encryption_configuration.logs:
+resource "aws_s3_bucket_server_side_encryption_configuration" "logs" {
+    bucket = "nextcloud-dev-alb-logs-039497794217-real-unicorn"
+    id     = "nextcloud-dev-alb-logs-039497794217-real-unicorn"
+
+    rule {
+        bucket_key_enabled = true
+
+        apply_server_side_encryption_by_default {
+            kms_master_key_id = "arn:aws:kms:eu-west-3:039497794217:key/c5442131-30be-4cf8-a017-30848a555274"
+            sse_algorithm     = "aws:kms"
+        }
+    }
+}
+
+# module.data.aws_s3_bucket_server_side_encryption_configuration.primary:
+resource "aws_s3_bucket_server_side_encryption_configuration" "primary" {
+    bucket = "nextcloud-dev-primary-039497794217-real-unicorn"
+    id     = "nextcloud-dev-primary-039497794217-real-unicorn"
+
+    rule {
+        bucket_key_enabled = true
+
+        apply_server_side_encryption_by_default {
+            kms_master_key_id = "arn:aws:kms:eu-west-3:039497794217:key/c5442131-30be-4cf8-a017-30848a555274"
+            sse_algorithm     = "aws:kms"
+        }
+    }
+}
+
+# module.data.aws_s3_bucket_versioning.primary:
+resource "aws_s3_bucket_versioning" "primary" {
+    bucket = "nextcloud-dev-primary-039497794217-real-unicorn"
+    id     = "nextcloud-dev-primary-039497794217-real-unicorn"
+
+    versioning_configuration {
+        status = "Enabled"
+    }
+}
+
+# module.data.random_pet.bucket_suffix:
+resource "random_pet" "bucket_suffix" {
+    id        = "real-unicorn"
+    length    = 2
+    separator = "-"
+}
+
+
+# module.networking.aws_eip.nat:
+resource "aws_eip" "nat" {
+    allocation_id        = "eipalloc-04f4a7ca1e1a671a9"
+    arn                  = "arn:aws:ec2:eu-west-3:039497794217:elastic-ip/eipalloc-04f4a7ca1e1a671a9"
+    association_id       = "eipassoc-03a94e25ad3fac817"
+    domain               = "vpc"
+    id                   = "eipalloc-04f4a7ca1e1a671a9"
+    network_border_group = "eu-west-3"
+    network_interface    = "eni-06773a7edc41f474c"
+    private_dns          = "ip-10-30-1-212.eu-west-3.compute.internal"
+    private_ip           = "10.30.1.212"
+    public_dns           = "ec2-15-224-91-49.eu-west-3.compute.amazonaws.com"
+    public_ip            = "15.224.91.49"
+    public_ipv4_pool     = "amazon"
+    tags                 = {
+        "Name" = "nextcloud-dev-nat-eip"
+    }
+    tags_all             = {
+        "Name" = "nextcloud-dev-nat-eip"
+    }
+    vpc                  = true
+}
+
+# module.networking.aws_internet_gateway.main:
+resource "aws_internet_gateway" "main" {
+    arn      = "arn:aws:ec2:eu-west-3:039497794217:internet-gateway/igw-0e123398d3dafc3a2"
+    id       = "igw-0e123398d3dafc3a2"
+    owner_id = "039497794217"
+    tags     = {
+        "Name" = "nextcloud-dev-igw"
+    }
+    tags_all = {
+        "Name" = "nextcloud-dev-igw"
+    }
+    vpc_id   = "vpc-09aed281b6aa94ced"
+}
+
+# module.networking.aws_nat_gateway.main:
+resource "aws_nat_gateway" "main" {
+    allocation_id                      = "eipalloc-04f4a7ca1e1a671a9"
+    association_id                     = "eipassoc-03a94e25ad3fac817"
+    connectivity_type                  = "public"
+    id                                 = "nat-0f5b30879c4ee5476"
+    network_interface_id               = "eni-06773a7edc41f474c"
+    private_ip                         = "10.30.1.212"
+    public_ip                          = "15.224.91.49"
+    secondary_allocation_ids           = []
+    secondary_private_ip_address_count = 0
+    secondary_private_ip_addresses     = []
+    subnet_id                          = "subnet-0ec66bc58c9cd078f"
+    tags                               = {
+        "Name" = "nextcloud-dev-nat"
+    }
+    tags_all                           = {
+        "Name" = "nextcloud-dev-nat"
+    }
+}
+
+# module.networking.aws_route_table.private:
+resource "aws_route_table" "private" {
+    arn              = "arn:aws:ec2:eu-west-3:039497794217:route-table/rtb-0a1f1685544c9bb7d"
+    id               = "rtb-0a1f1685544c9bb7d"
+    owner_id         = "039497794217"
+    propagating_vgws = []
+    route            = [
+        {
+            carrier_gateway_id         = ""
+            cidr_block                 = "0.0.0.0/0"
+            core_network_arn           = ""
+            destination_prefix_list_id = ""
+            egress_only_gateway_id     = ""
+            gateway_id                 = ""
+            ipv6_cidr_block            = ""
+            local_gateway_id           = ""
+            nat_gateway_id             = "nat-0f5b30879c4ee5476"
+            network_interface_id       = ""
+            transit_gateway_id         = ""
+            vpc_endpoint_id            = ""
+            vpc_peering_connection_id  = ""
+        },
+    ]
+    tags             = {
+        "Name" = "nextcloud-dev-private-rt"
+    }
+    tags_all         = {
+        "Name" = "nextcloud-dev-private-rt"
+    }
+    vpc_id           = "vpc-09aed281b6aa94ced"
+}
+
+# module.networking.aws_route_table.public:
+resource "aws_route_table" "public" {
+    arn              = "arn:aws:ec2:eu-west-3:039497794217:route-table/rtb-0021344115d046321"
+    id               = "rtb-0021344115d046321"
+    owner_id         = "039497794217"
+    propagating_vgws = []
+    route            = [
+        {
+            carrier_gateway_id         = ""
+            cidr_block                 = "0.0.0.0/0"
+            core_network_arn           = ""
+            destination_prefix_list_id = ""
+            egress_only_gateway_id     = ""
+            gateway_id                 = "igw-0e123398d3dafc3a2"
+            ipv6_cidr_block            = ""
+            local_gateway_id           = ""
+            nat_gateway_id             = ""
+            network_interface_id       = ""
+            transit_gateway_id         = ""
+            vpc_endpoint_id            = ""
+            vpc_peering_connection_id  = ""
+        },
+    ]
+    tags             = {
+        "Name" = "nextcloud-dev-public-rt"
+    }
+    tags_all         = {
+        "Name" = "nextcloud-dev-public-rt"
+    }
+    vpc_id           = "vpc-09aed281b6aa94ced"
+}
+
+# module.networking.aws_route_table_association.private_app["eu-west-3a"]:
+resource "aws_route_table_association" "private_app" {
+    id             = "rtbassoc-0efd7395e490719de"
+    route_table_id = "rtb-0a1f1685544c9bb7d"
+    subnet_id      = "subnet-0639db95e384adff4"
+}
+
+# module.networking.aws_route_table_association.private_app["eu-west-3b"]:
+resource "aws_route_table_association" "private_app" {
+    id             = "rtbassoc-0bb51469a8951c330"
+    route_table_id = "rtb-0a1f1685544c9bb7d"
+    subnet_id      = "subnet-0765a42c870676a72"
+}
+
+# module.networking.aws_route_table_association.private_db["eu-west-3a"]:
+resource "aws_route_table_association" "private_db" {
+    id             = "rtbassoc-0672e2fb5d31ab666"
+    route_table_id = "rtb-0a1f1685544c9bb7d"
+    subnet_id      = "subnet-03c8c4b21491162ca"
+}
+
+# module.networking.aws_route_table_association.private_db["eu-west-3b"]:
+resource "aws_route_table_association" "private_db" {
+    id             = "rtbassoc-0ab204f00f32b9185"
+    route_table_id = "rtb-0a1f1685544c9bb7d"
+    subnet_id      = "subnet-0322d61ef73fa74bb"
+}
+
+# module.networking.aws_route_table_association.public["eu-west-3a"]:
+resource "aws_route_table_association" "public" {
+    id             = "rtbassoc-009fadb5ea646a0a1"
+    route_table_id = "rtb-0021344115d046321"
+    subnet_id      = "subnet-0ec66bc58c9cd078f"
+}
+
+# module.networking.aws_route_table_association.public["eu-west-3b"]:
+resource "aws_route_table_association" "public" {
+    id             = "rtbassoc-0df1e6e4ce1e9b033"
+    route_table_id = "rtb-0021344115d046321"
+    subnet_id      = "subnet-0e30cb53602764957"
+}
+
+# module.networking.aws_security_group.vpc_endpoints:
+resource "aws_security_group" "vpc_endpoints" {
+    arn                    = "arn:aws:ec2:eu-west-3:039497794217:security-group/sg-0891535376fc80893"
+    description            = "Autorise HTTPS depuis VPC vers les VPC endpoints"
+    egress                 = []
+    id                     = "sg-0891535376fc80893"
+    ingress                = [
+        {
+            cidr_blocks      = [
+                "10.30.0.0/16",
+            ]
+            description      = "HTTPS 443 depuis le VPC"
+            from_port        = 443
+            ipv6_cidr_blocks = []
+            prefix_list_ids  = []
+            protocol         = "tcp"
+            security_groups  = []
+            self             = false
+            to_port          = 443
+        },
+    ]
+    name                   = "nextcloud-dev-vpce-sg"
+    owner_id               = "039497794217"
+    revoke_rules_on_delete = false
+    tags                   = {
+        "Name" = "nextcloud-dev-vpce-sg"
+    }
+    tags_all               = {
+        "Name" = "nextcloud-dev-vpce-sg"
+    }
+    vpc_id                 = "vpc-09aed281b6aa94ced"
+}
+
+# module.networking.aws_subnet.private_app["eu-west-3a"]:
+resource "aws_subnet" "private_app" {
+    arn                                            = "arn:aws:ec2:eu-west-3:039497794217:subnet/subnet-0639db95e384adff4"
+    assign_ipv6_address_on_creation                = false
+    availability_zone                              = "eu-west-3a"
+    availability_zone_id                           = "euw3-az1"
+    cidr_block                                     = "10.30.11.0/24"
+    enable_dns64                                   = false
+    enable_lni_at_device_index                     = 0
+    enable_resource_name_dns_a_record_on_launch    = false
+    enable_resource_name_dns_aaaa_record_on_launch = false
+    id                                             = "subnet-0639db95e384adff4"
+    ipv6_native                                    = false
+    map_customer_owned_ip_on_launch                = false
+    map_public_ip_on_launch                        = false
+    owner_id                                       = "039497794217"
+    private_dns_hostname_type_on_launch            = "ip-name"
+    tags                                           = {
+        "Name" = "nextcloud-dev-private-app-eu-west-3a"
+        "Tier" = "private-app"
+    }
+    tags_all                                       = {
+        "Name" = "nextcloud-dev-private-app-eu-west-3a"
+        "Tier" = "private-app"
+    }
+    vpc_id                                         = "vpc-09aed281b6aa94ced"
+}
+
+# module.networking.aws_subnet.private_app["eu-west-3b"]:
+resource "aws_subnet" "private_app" {
+    arn                                            = "arn:aws:ec2:eu-west-3:039497794217:subnet/subnet-0765a42c870676a72"
+    assign_ipv6_address_on_creation                = false
+    availability_zone                              = "eu-west-3b"
+    availability_zone_id                           = "euw3-az2"
+    cidr_block                                     = "10.30.12.0/24"
+    enable_dns64                                   = false
+    enable_lni_at_device_index                     = 0
+    enable_resource_name_dns_a_record_on_launch    = false
+    enable_resource_name_dns_aaaa_record_on_launch = false
+    id                                             = "subnet-0765a42c870676a72"
+    ipv6_native                                    = false
+    map_customer_owned_ip_on_launch                = false
+    map_public_ip_on_launch                        = false
+    owner_id                                       = "039497794217"
+    private_dns_hostname_type_on_launch            = "ip-name"
+    tags                                           = {
+        "Name" = "nextcloud-dev-private-app-eu-west-3b"
+        "Tier" = "private-app"
+    }
+    tags_all                                       = {
+        "Name" = "nextcloud-dev-private-app-eu-west-3b"
+        "Tier" = "private-app"
+    }
+    vpc_id                                         = "vpc-09aed281b6aa94ced"
+}
+
+# module.networking.aws_subnet.private_db["eu-west-3a"]:
+resource "aws_subnet" "private_db" {
+    arn                                            = "arn:aws:ec2:eu-west-3:039497794217:subnet/subnet-03c8c4b21491162ca"
+    assign_ipv6_address_on_creation                = false
+    availability_zone                              = "eu-west-3a"
+    availability_zone_id                           = "euw3-az1"
+    cidr_block                                     = "10.30.21.0/24"
+    enable_dns64                                   = false
+    enable_lni_at_device_index                     = 0
+    enable_resource_name_dns_a_record_on_launch    = false
+    enable_resource_name_dns_aaaa_record_on_launch = false
+    id                                             = "subnet-03c8c4b21491162ca"
+    ipv6_native                                    = false
+    map_customer_owned_ip_on_launch                = false
+    map_public_ip_on_launch                        = false
+    owner_id                                       = "039497794217"
+    private_dns_hostname_type_on_launch            = "ip-name"
+    tags                                           = {
+        "Name" = "nextcloud-dev-private-db-eu-west-3a"
+        "Tier" = "private-db"
+    }
+    tags_all                                       = {
+        "Name" = "nextcloud-dev-private-db-eu-west-3a"
+        "Tier" = "private-db"
+    }
+    vpc_id                                         = "vpc-09aed281b6aa94ced"
+}
+
+# module.networking.aws_subnet.private_db["eu-west-3b"]:
+resource "aws_subnet" "private_db" {
+    arn                                            = "arn:aws:ec2:eu-west-3:039497794217:subnet/subnet-0322d61ef73fa74bb"
+    assign_ipv6_address_on_creation                = false
+    availability_zone                              = "eu-west-3b"
+    availability_zone_id                           = "euw3-az2"
+    cidr_block                                     = "10.30.22.0/24"
+    enable_dns64                                   = false
+    enable_lni_at_device_index                     = 0
+    enable_resource_name_dns_a_record_on_launch    = false
+    enable_resource_name_dns_aaaa_record_on_launch = false
+    id                                             = "subnet-0322d61ef73fa74bb"
+    ipv6_native                                    = false
+    map_customer_owned_ip_on_launch                = false
+    map_public_ip_on_launch                        = false
+    owner_id                                       = "039497794217"
+    private_dns_hostname_type_on_launch            = "ip-name"
+    tags                                           = {
+        "Name" = "nextcloud-dev-private-db-eu-west-3b"
+        "Tier" = "private-db"
+    }
+    tags_all                                       = {
+        "Name" = "nextcloud-dev-private-db-eu-west-3b"
+        "Tier" = "private-db"
+    }
+    vpc_id                                         = "vpc-09aed281b6aa94ced"
+}
+
+# module.networking.aws_subnet.public["eu-west-3a"]:
+resource "aws_subnet" "public" {
+    arn                                            = "arn:aws:ec2:eu-west-3:039497794217:subnet/subnet-0ec66bc58c9cd078f"
+    assign_ipv6_address_on_creation                = false
+    availability_zone                              = "eu-west-3a"
+    availability_zone_id                           = "euw3-az1"
+    cidr_block                                     = "10.30.1.0/24"
+    enable_dns64                                   = false
+    enable_lni_at_device_index                     = 0
+    enable_resource_name_dns_a_record_on_launch    = false
+    enable_resource_name_dns_aaaa_record_on_launch = false
+    id                                             = "subnet-0ec66bc58c9cd078f"
+    ipv6_native                                    = false
+    map_customer_owned_ip_on_launch                = false
+    map_public_ip_on_launch                        = true
+    owner_id                                       = "039497794217"
+    private_dns_hostname_type_on_launch            = "ip-name"
+    tags                                           = {
+        "Name" = "nextcloud-dev-public-eu-west-3a"
+        "Tier" = "public"
+    }
+    tags_all                                       = {
+        "Name" = "nextcloud-dev-public-eu-west-3a"
+        "Tier" = "public"
+    }
+    vpc_id                                         = "vpc-09aed281b6aa94ced"
+}
+
+# module.networking.aws_subnet.public["eu-west-3b"]:
+resource "aws_subnet" "public" {
+    arn                                            = "arn:aws:ec2:eu-west-3:039497794217:subnet/subnet-0e30cb53602764957"
+    assign_ipv6_address_on_creation                = false
+    availability_zone                              = "eu-west-3b"
+    availability_zone_id                           = "euw3-az2"
+    cidr_block                                     = "10.30.2.0/24"
+    enable_dns64                                   = false
+    enable_lni_at_device_index                     = 0
+    enable_resource_name_dns_a_record_on_launch    = false
+    enable_resource_name_dns_aaaa_record_on_launch = false
+    id                                             = "subnet-0e30cb53602764957"
+    ipv6_native                                    = false
+    map_customer_owned_ip_on_launch                = false
+    map_public_ip_on_launch                        = true
+    owner_id                                       = "039497794217"
+    private_dns_hostname_type_on_launch            = "ip-name"
+    tags                                           = {
+        "Name" = "nextcloud-dev-public-eu-west-3b"
+        "Tier" = "public"
+    }
+    tags_all                                       = {
+        "Name" = "nextcloud-dev-public-eu-west-3b"
+        "Tier" = "public"
+    }
+    vpc_id                                         = "vpc-09aed281b6aa94ced"
+}
+
+# module.networking.aws_vpc.main:
+resource "aws_vpc" "main" {
+    arn                                  = "arn:aws:ec2:eu-west-3:039497794217:vpc/vpc-09aed281b6aa94ced"
+    assign_generated_ipv6_cidr_block     = false
+    cidr_block                           = "10.30.0.0/16"
+    default_network_acl_id               = "acl-0ea253a9ba677c897"
+    default_route_table_id               = "rtb-03281aef6dc5758df"
+    default_security_group_id            = "sg-02f8831bdfc4fdf0b"
+    dhcp_options_id                      = "dopt-01f1c51c68cc28274"
+    enable_dns_hostnames                 = true
+    enable_dns_support                   = true
+    enable_network_address_usage_metrics = false
+    id                                   = "vpc-09aed281b6aa94ced"
+    instance_tenancy                     = "default"
+    ipv6_netmask_length                  = 0
+    main_route_table_id                  = "rtb-03281aef6dc5758df"
+    owner_id                             = "039497794217"
+    tags                                 = {
+        "Name" = "nextcloud-dev-vpc"
+    }
+    tags_all                             = {
+        "Name" = "nextcloud-dev-vpc"
+    }
+}
+
+# module.networking.aws_vpc_endpoint.s3:
+resource "aws_vpc_endpoint" "s3" {
+    arn                   = "arn:aws:ec2:eu-west-3:039497794217:vpc-endpoint/vpce-0582727ef61105ca8"
+    cidr_blocks           = [
+        "3.5.224.0/22",
+        "16.12.18.0/23",
+        "3.5.204.0/22",
+        "52.95.154.0/23",
+        "16.12.20.0/24",
+        "52.95.156.0/24",
+    ]
+    dns_entry             = []
+    id                    = "vpce-0582727ef61105ca8"
+    ip_address_type       = "ipv4"
+    network_interface_ids = []
+    owner_id              = "039497794217"
+    policy                = jsonencode(
+        {
+            Statement = [
+                {
+                    Action    = "*"
+                    Effect    = "Allow"
+                    Principal = "*"
+                    Resource  = "*"
+                },
+            ]
+            Version   = "2008-10-17"
+        }
+    )
+    prefix_list_id        = "pl-23ad484a"
+    private_dns_enabled   = false
+    requester_managed     = false
+    route_table_ids       = [
+        "rtb-0a1f1685544c9bb7d",
+    ]
+    security_group_ids    = []
+    service_name          = "com.amazonaws.eu-west-3.s3"
+    service_region        = "eu-west-3"
+    state                 = "available"
+    subnet_ids            = []
+    tags                  = {
+        "Name" = "nextcloud-dev-vpce-s3"
+    }
+    tags_all              = {
+        "Name" = "nextcloud-dev-vpce-s3"
+    }
+    vpc_endpoint_type     = "Gateway"
+    vpc_id                = "vpc-09aed281b6aa94ced"
+
+    dns_options {
+        dns_record_ip_type                             = "service-defined"
+        private_dns_only_for_inbound_resolver_endpoint = false
+    }
+}
+
+# module.networking.aws_vpc_endpoint.secretsmanager:
+resource "aws_vpc_endpoint" "secretsmanager" {
+    arn                   = "arn:aws:ec2:eu-west-3:039497794217:vpc-endpoint/vpce-08e71d1100bf4da6a"
+    cidr_blocks           = []
+    dns_entry             = [
+        {
+            dns_name       = "vpce-08e71d1100bf4da6a-kgc1ve1i.secretsmanager.eu-west-3.vpce.amazonaws.com"
+            hosted_zone_id = "Z1DWHTMFP0WECP"
+        },
+        {
+            dns_name       = "vpce-08e71d1100bf4da6a-kgc1ve1i-eu-west-3b.secretsmanager.eu-west-3.vpce.amazonaws.com"
+            hosted_zone_id = "Z1DWHTMFP0WECP"
+        },
+        {
+            dns_name       = "vpce-08e71d1100bf4da6a-kgc1ve1i-eu-west-3a.secretsmanager.eu-west-3.vpce.amazonaws.com"
+            hosted_zone_id = "Z1DWHTMFP0WECP"
+        },
+        {
+            dns_name       = "secretsmanager.eu-west-3.amazonaws.com"
+            hosted_zone_id = "Z0821205VFYC7O58J3YO"
+        },
+    ]
+    id                    = "vpce-08e71d1100bf4da6a"
+    ip_address_type       = "ipv4"
+    network_interface_ids = [
+        "eni-0520bc0b7ab182e3c",
+        "eni-0cf3824202b275175",
+    ]
+    owner_id              = "039497794217"
+    policy                = jsonencode(
+        {
+            Statement = [
+                {
+                    Action    = "*"
+                    Effect    = "Allow"
+                    Principal = "*"
+                    Resource  = "*"
+                },
+            ]
+        }
+    )
+    private_dns_enabled   = true
+    requester_managed     = false
+    route_table_ids       = []
+    security_group_ids    = [
+        "sg-0891535376fc80893",
+    ]
+    service_name          = "com.amazonaws.eu-west-3.secretsmanager"
+    service_region        = "eu-west-3"
+    state                 = "available"
+    subnet_ids            = [
+        "subnet-0639db95e384adff4",
+        "subnet-0765a42c870676a72",
+    ]
+    tags                  = {
+        "Name" = "nextcloud-dev-vpce-secretsmanager"
+    }
+    tags_all              = {
+        "Name" = "nextcloud-dev-vpce-secretsmanager"
+    }
+    vpc_endpoint_type     = "Interface"
+    vpc_id                = "vpc-09aed281b6aa94ced"
+
+    dns_options {
+        dns_record_ip_type                             = "ipv4"
+        private_dns_only_for_inbound_resolver_endpoint = false
+    }
+
+    subnet_configuration {
+        ipv4      = "10.30.11.60"
+        subnet_id = "subnet-0639db95e384adff4"
+    }
+    subnet_configuration {
+        ipv4      = "10.30.12.139"
+        subnet_id = "subnet-0765a42c870676a72"
+    }
+}
+
+# module.networking.aws_vpc_security_group_ingress_rule.vpce_https_from_vpc:
+resource "aws_vpc_security_group_ingress_rule" "vpce_https_from_vpc" {
+    arn                    = "arn:aws:ec2:eu-west-3:039497794217:security-group-rule/sgr-034fe0b4d8d8d0ba3"
+    cidr_ipv4              = "10.30.0.0/16"
+    description            = "HTTPS 443 depuis le VPC"
+    from_port              = 443
+    id                     = "sgr-034fe0b4d8d8d0ba3"
+    ip_protocol            = "tcp"
+    security_group_id      = "sg-0891535376fc80893"
+    security_group_rule_id = "sgr-034fe0b4d8d8d0ba3"
+    tags_all               = {}
+    to_port                = 443
+}
+
+
+# module.security.data.aws_caller_identity.current:
+data "aws_caller_identity" "current" {
+    account_id = "039497794217"
+    arn        = "arn:aws:iam::039497794217:user/etudiant02"
+    id         = "039497794217"
+    user_id    = "AIDAQSMSAQKU5NOCSA3E3"
+}
+
+# module.security.data.aws_iam_policy_document.app_assume_role:
+data "aws_iam_policy_document" "app_assume_role" {
+    id            = "2851119427"
+    json          = jsonencode(
+        {
+            Statement = [
+                {
+                    Action    = "sts:AssumeRole"
+                    Effect    = "Allow"
+                    Principal = {
+                        Service = "ec2.amazonaws.com"
+                    }
+                },
+            ]
+            Version   = "2012-10-17"
+        }
+    )
+    minified_json = jsonencode(
+        {
+            Statement = [
+                {
+                    Action    = "sts:AssumeRole"
+                    Effect    = "Allow"
+                    Principal = {
+                        Service = "ec2.amazonaws.com"
+                    }
+                },
+            ]
+            Version   = "2012-10-17"
+        }
+    )
+    version       = "2012-10-17"
+
+    statement {
+        actions       = [
+            "sts:AssumeRole",
+        ]
+        effect        = "Allow"
+        not_actions   = []
+        not_resources = []
+        resources     = []
+
+        principals {
+            identifiers = [
+                "ec2.amazonaws.com",
+            ]
+            type        = "Service"
+        }
+    }
+}
+
+# module.security.data.aws_iam_policy_document.app_kms:
+data "aws_iam_policy_document" "app_kms" {
+    id            = "2913204373"
+    json          = jsonencode(
+        {
+            Statement = [
+                {
+                    Action   = [
+                        "kms:DescribeKey",
+                        "kms:Decrypt",
+                    ]
+                    Effect   = "Allow"
+                    Resource = "arn:aws:kms:eu-west-3:039497794217:key/c5442131-30be-4cf8-a017-30848a555274"
+                    Sid      = "NextcloudKmsDecrypt"
+                },
+            ]
+            Version   = "2012-10-17"
+        }
+    )
+    minified_json = jsonencode(
+        {
+            Statement = [
+                {
+                    Action   = [
+                        "kms:DescribeKey",
+                        "kms:Decrypt",
+                    ]
+                    Effect   = "Allow"
+                    Resource = "arn:aws:kms:eu-west-3:039497794217:key/c5442131-30be-4cf8-a017-30848a555274"
+                    Sid      = "NextcloudKmsDecrypt"
+                },
+            ]
+            Version   = "2012-10-17"
+        }
+    )
+    version       = "2012-10-17"
+
+    statement {
+        actions       = [
+            "kms:Decrypt",
+            "kms:DescribeKey",
+        ]
+        effect        = "Allow"
+        not_actions   = []
+        not_resources = []
+        resources     = [
+            "arn:aws:kms:eu-west-3:039497794217:key/c5442131-30be-4cf8-a017-30848a555274",
+        ]
+        sid           = "NextcloudKmsDecrypt"
+    }
+}
+
+# module.security.data.aws_iam_policy_document.app_s3:
+data "aws_iam_policy_document" "app_s3" {
+    id            = "838338433"
+    json          = jsonencode(
+        {
+            Statement = [
+                {
+                    Action   = [
+                        "s3:PutObject",
+                        "s3:GetObjectVersion",
+                        "s3:GetObject",
+                        "s3:DeleteObject",
+                        "s3:AbortMultipartUpload",
+                    ]
+                    Effect   = "Allow"
+                    Resource = "arn:aws:s3:::placeholder/*"
+                    Sid      = "NextcloudS3Objects"
+                },
+                {
+                    Action   = [
+                        "s3:ListBucketMultipartUploads",
+                        "s3:ListBucket",
+                        "s3:GetBucketLocation",
+                    ]
+                    Effect   = "Allow"
+                    Resource = "arn:aws:s3:::placeholder"
+                    Sid      = "NextcloudS3Bucket"
+                },
+            ]
+            Version   = "2012-10-17"
+        }
+    )
+    minified_json = jsonencode(
+        {
+            Statement = [
+                {
+                    Action   = [
+                        "s3:PutObject",
+                        "s3:GetObjectVersion",
+                        "s3:GetObject",
+                        "s3:DeleteObject",
+                        "s3:AbortMultipartUpload",
+                    ]
+                    Effect   = "Allow"
+                    Resource = "arn:aws:s3:::placeholder/*"
+                    Sid      = "NextcloudS3Objects"
+                },
+                {
+                    Action   = [
+                        "s3:ListBucketMultipartUploads",
+                        "s3:ListBucket",
+                        "s3:GetBucketLocation",
+                    ]
+                    Effect   = "Allow"
+                    Resource = "arn:aws:s3:::placeholder"
+                    Sid      = "NextcloudS3Bucket"
+                },
+            ]
+            Version   = "2012-10-17"
+        }
+    )
+    version       = "2012-10-17"
+
+    statement {
+        actions       = [
+            "s3:AbortMultipartUpload",
+            "s3:DeleteObject",
+            "s3:GetObject",
+            "s3:GetObjectVersion",
+            "s3:PutObject",
+        ]
+        effect        = "Allow"
+        not_actions   = []
+        not_resources = []
+        resources     = [
+            "arn:aws:s3:::placeholder/*",
+        ]
+        sid           = "NextcloudS3Objects"
+    }
+    statement {
+        actions       = [
+            "s3:GetBucketLocation",
+            "s3:ListBucket",
+            "s3:ListBucketMultipartUploads",
+        ]
+        effect        = "Allow"
+        not_actions   = []
+        not_resources = []
+        resources     = [
+            "arn:aws:s3:::placeholder",
+        ]
+        sid           = "NextcloudS3Bucket"
+    }
+}
+
+# module.security.data.aws_iam_policy_document.app_secrets:
+data "aws_iam_policy_document" "app_secrets" {
+    id            = "3384217908"
+    json          = jsonencode(
+        {
+            Statement = [
+                {
+                    Action   = [
+                        "secretsmanager:GetSecretValue",
+                        "secretsmanager:DescribeSecret",
+                    ]
+                    Effect   = "Allow"
+                    Resource = [
+                        "arn:aws:secretsmanager:eu-west-3:039497794217:secret:nextcloud-dev/nextcloud/admin-password-8tTkXJ",
+                        "arn:aws:secretsmanager:eu-west-3:039497794217:secret:nextcloud-dev/db/password-6Kv9aR",
+                    ]
+                    Sid      = "NextcloudSecrets"
+                },
+            ]
+            Version   = "2012-10-17"
+        }
+    )
+    minified_json = jsonencode(
+        {
+            Statement = [
+                {
+                    Action   = [
+                        "secretsmanager:GetSecretValue",
+                        "secretsmanager:DescribeSecret",
+                    ]
+                    Effect   = "Allow"
+                    Resource = [
+                        "arn:aws:secretsmanager:eu-west-3:039497794217:secret:nextcloud-dev/nextcloud/admin-password-8tTkXJ",
+                        "arn:aws:secretsmanager:eu-west-3:039497794217:secret:nextcloud-dev/db/password-6Kv9aR",
+                    ]
+                    Sid      = "NextcloudSecrets"
+                },
+            ]
+            Version   = "2012-10-17"
+        }
+    )
+    version       = "2012-10-17"
+
+    statement {
+        actions       = [
+            "secretsmanager:DescribeSecret",
+            "secretsmanager:GetSecretValue",
+        ]
+        effect        = "Allow"
+        not_actions   = []
+        not_resources = []
+        resources     = [
+            "arn:aws:secretsmanager:eu-west-3:039497794217:secret:nextcloud-dev/db/password-6Kv9aR",
+            "arn:aws:secretsmanager:eu-west-3:039497794217:secret:nextcloud-dev/nextcloud/admin-password-8tTkXJ",
+        ]
+        sid           = "NextcloudSecrets"
+    }
+}
+
+# module.security.data.aws_partition.current:
+data "aws_partition" "current" {
+    dns_suffix         = "amazonaws.com"
+    id                 = "aws"
+    partition          = "aws"
+    reverse_dns_prefix = "com.amazonaws"
+}
+
+# module.security.aws_iam_instance_profile.app:
+resource "aws_iam_instance_profile" "app" {
+    arn         = "arn:aws:iam::039497794217:instance-profile/nextcloud-dev-app"
+    create_date = "2026-06-12T12:44:07Z"
+    id          = "nextcloud-dev-app"
+    name        = "nextcloud-dev-app"
+    path        = "/"
+    role        = "nextcloud-dev-app"
+    tags        = {}
+    tags_all    = {}
+    unique_id   = "AIPAQSMSAQKUYMSMK7YDR"
+}
+
+# module.security.aws_iam_role.app:
+resource "aws_iam_role" "app" {
+    arn                   = "arn:aws:iam::039497794217:role/nextcloud-dev-app"
+    assume_role_policy    = jsonencode(
+        {
+            Statement = [
+                {
+                    Action    = "sts:AssumeRole"
+                    Effect    = "Allow"
+                    Principal = {
+                        Service = "ec2.amazonaws.com"
+                    }
+                },
+            ]
+            Version   = "2012-10-17"
+        }
+    )
+    create_date           = "2026-06-12T12:09:27Z"
+    description           = "Role runtime pour EC2 Nextcloud"
+    force_detach_policies = false
+    id                    = "nextcloud-dev-app"
+    managed_policy_arns   = [
+        "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+        "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy",
+    ]
+    max_session_duration  = 3600
+    name                  = "nextcloud-dev-app"
+    path                  = "/"
+    permissions_boundary  = "arn:aws:iam::039497794217:policy/formation-permissions-boundary-paris"
+    tags                  = {
+        "Environment" = "dev"
+        "ManagedBy"   = "Terraform"
+        "Module"      = "security"
+        "Name"        = "nextcloud-dev-app-role"
+        "Project"     = "nextcloud"
+    }
+    tags_all              = {
+        "Environment" = "dev"
+        "ManagedBy"   = "Terraform"
+        "Module"      = "security"
+        "Name"        = "nextcloud-dev-app-role"
+        "Project"     = "nextcloud"
+    }
+    unique_id             = "AROAQSMSAQKU77BRDKXVI"
+
+    inline_policy {
+        name   = "nextcloud-dev-app-kms"
+        policy = jsonencode(
+            {
+                Statement = [
+                    {
+                        Action   = [
+                            "kms:DescribeKey",
+                            "kms:Decrypt",
+                        ]
+                        Effect   = "Allow"
+                        Resource = "arn:aws:kms:eu-west-3:039497794217:key/c5442131-30be-4cf8-a017-30848a555274"
+                        Sid      = "NextcloudKmsDecrypt"
+                    },
+                ]
+                Version   = "2012-10-17"
+            }
+        )
+    }
+    inline_policy {
+        name   = "nextcloud-dev-app-s3"
+        policy = jsonencode(
+            {
+                Statement = [
+                    {
+                        Action   = [
+                            "s3:PutObject",
+                            "s3:GetObjectVersion",
+                            "s3:GetObject",
+                            "s3:DeleteObject",
+                            "s3:AbortMultipartUpload",
+                        ]
+                        Effect   = "Allow"
+                        Resource = "arn:aws:s3:::placeholder/*"
+                        Sid      = "NextcloudS3Objects"
+                    },
+                    {
+                        Action   = [
+                            "s3:ListBucketMultipartUploads",
+                            "s3:ListBucket",
+                            "s3:GetBucketLocation",
+                        ]
+                        Effect   = "Allow"
+                        Resource = "arn:aws:s3:::placeholder"
+                        Sid      = "NextcloudS3Bucket"
+                    },
+                ]
+                Version   = "2012-10-17"
+            }
+        )
+    }
+    inline_policy {
+        name   = "nextcloud-dev-app-s3-real"
+        policy = jsonencode(
+            {
+                Statement = [
+                    {
+                        Action   = [
+                            "s3:GetObject",
+                            "s3:PutObject",
+                            "s3:DeleteObject",
+                            "s3:GetObjectVersion",
+                            "s3:AbortMultipartUpload",
+                        ]
+                        Effect   = "Allow"
+                        Resource = "arn:aws:s3:::nextcloud-dev-primary-039497794217-real-unicorn/*"
+                        Sid      = "NextcloudS3Objects"
+                    },
+                    {
+                        Action   = [
+                            "s3:ListBucket",
+                            "s3:GetBucketLocation",
+                            "s3:ListBucketMultipartUploads",
+                        ]
+                        Effect   = "Allow"
+                        Resource = "arn:aws:s3:::nextcloud-dev-primary-039497794217-real-unicorn"
+                        Sid      = "NextcloudS3Bucket"
+                    },
+                ]
+                Version   = "2012-10-17"
+            }
+        )
+    }
+    inline_policy {
+        name   = "nextcloud-dev-app-secrets"
+        policy = jsonencode(
+            {
+                Statement = [
+                    {
+                        Action   = [
+                            "secretsmanager:GetSecretValue",
+                            "secretsmanager:DescribeSecret",
+                        ]
+                        Effect   = "Allow"
+                        Resource = [
+                            "arn:aws:secretsmanager:eu-west-3:039497794217:secret:nextcloud-dev/nextcloud/admin-password-8tTkXJ",
+                            "arn:aws:secretsmanager:eu-west-3:039497794217:secret:nextcloud-dev/db/password-6Kv9aR",
+                        ]
+                        Sid      = "NextcloudSecrets"
+                    },
+                ]
+                Version   = "2012-10-17"
+            }
+        )
+    }
+}
+
+# module.security.aws_iam_role_policy.app_kms:
+resource "aws_iam_role_policy" "app_kms" {
+    id     = "nextcloud-dev-app:nextcloud-dev-app-kms"
+    name   = "nextcloud-dev-app-kms"
+    policy = jsonencode(
+        {
+            Statement = [
+                {
+                    Action   = [
+                        "kms:DescribeKey",
+                        "kms:Decrypt",
+                    ]
+                    Effect   = "Allow"
+                    Resource = "arn:aws:kms:eu-west-3:039497794217:key/c5442131-30be-4cf8-a017-30848a555274"
+                    Sid      = "NextcloudKmsDecrypt"
+                },
+            ]
+            Version   = "2012-10-17"
+        }
+    )
+    role   = "nextcloud-dev-app"
+}
+
+# module.security.aws_iam_role_policy.app_s3:
+resource "aws_iam_role_policy" "app_s3" {
+    id     = "nextcloud-dev-app:nextcloud-dev-app-s3"
+    name   = "nextcloud-dev-app-s3"
+    policy = jsonencode(
+        {
+            Statement = [
+                {
+                    Action   = [
+                        "s3:PutObject",
+                        "s3:GetObjectVersion",
+                        "s3:GetObject",
+                        "s3:DeleteObject",
+                        "s3:AbortMultipartUpload",
+                    ]
+                    Effect   = "Allow"
+                    Resource = "arn:aws:s3:::placeholder/*"
+                    Sid      = "NextcloudS3Objects"
+                },
+                {
+                    Action   = [
+                        "s3:ListBucketMultipartUploads",
+                        "s3:ListBucket",
+                        "s3:GetBucketLocation",
+                    ]
+                    Effect   = "Allow"
+                    Resource = "arn:aws:s3:::placeholder"
+                    Sid      = "NextcloudS3Bucket"
+                },
+            ]
+            Version   = "2012-10-17"
+        }
+    )
+    role   = "nextcloud-dev-app"
+}
+
+# module.security.aws_iam_role_policy.app_secrets:
+resource "aws_iam_role_policy" "app_secrets" {
+    id     = "nextcloud-dev-app:nextcloud-dev-app-secrets"
+    name   = "nextcloud-dev-app-secrets"
+    policy = jsonencode(
+        {
+            Statement = [
+                {
+                    Action   = [
+                        "secretsmanager:GetSecretValue",
+                        "secretsmanager:DescribeSecret",
+                    ]
+                    Effect   = "Allow"
+                    Resource = [
+                        "arn:aws:secretsmanager:eu-west-3:039497794217:secret:nextcloud-dev/nextcloud/admin-password-8tTkXJ",
+                        "arn:aws:secretsmanager:eu-west-3:039497794217:secret:nextcloud-dev/db/password-6Kv9aR",
+                    ]
+                    Sid      = "NextcloudSecrets"
+                },
+            ]
+            Version   = "2012-10-17"
+        }
+    )
+    role   = "nextcloud-dev-app"
+}
+
+# module.security.aws_iam_role_policy_attachment.app_cloudwatch:
+resource "aws_iam_role_policy_attachment" "app_cloudwatch" {
+    id         = "nextcloud-dev-app-20260612120928077000000001"
+    policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+    role       = "nextcloud-dev-app"
+}
+
+# module.security.aws_iam_role_policy_attachment.app_ssm:
+resource "aws_iam_role_policy_attachment" "app_ssm" {
+    id         = "nextcloud-dev-app-20260612120928270200000002"
+    policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+    role       = "nextcloud-dev-app"
+}
+
+# module.security.aws_kms_alias.main:
+resource "aws_kms_alias" "main" {
+    arn            = "arn:aws:kms:eu-west-3:039497794217:alias/nextcloud-dev-main"
+    id             = "alias/nextcloud-dev-main"
+    name           = "alias/nextcloud-dev-main"
+    target_key_arn = "arn:aws:kms:eu-west-3:039497794217:key/c5442131-30be-4cf8-a017-30848a555274"
+    target_key_id  = "c5442131-30be-4cf8-a017-30848a555274"
+}
+
+# module.security.aws_kms_key.main:
+resource "aws_kms_key" "main" {
+    arn                                = "arn:aws:kms:eu-west-3:039497794217:key/c5442131-30be-4cf8-a017-30848a555274"
+    bypass_policy_lockout_safety_check = false
+    customer_master_key_spec           = "SYMMETRIC_DEFAULT"
+    deletion_window_in_days            = 10
+    description                        = "CMK principale nextcloud-dev - chiffrement S3 RDS Secrets"
+    enable_key_rotation                = true
+    id                                 = "c5442131-30be-4cf8-a017-30848a555274"
+    is_enabled                         = true
+    key_id                             = "c5442131-30be-4cf8-a017-30848a555274"
+    key_usage                          = "ENCRYPT_DECRYPT"
+    multi_region                       = false
+    policy                             = jsonencode(
+        {
+            Statement = [
+                {
+                    Action    = "kms:*"
+                    Effect    = "Allow"
+                    Principal = {
+                        AWS = "arn:aws:iam::039497794217:root"
+                    }
+                    Resource  = "*"
+                    Sid       = "EnableRootAccountAccess"
+                },
+                {
+                    Action    = [
+                        "kms:Decrypt",
+                        "kms:DescribeKey",
+                        "kms:GenerateDataKey",
+                    ]
+                    Effect    = "Allow"
+                    Principal = {
+                        AWS = "arn:aws:iam::039497794217:role/nextcloud-dev-app"
+                    }
+                    Resource  = "*"
+                    Sid       = "AllowAppRoleUsage"
+                },
+            ]
+            Version   = "2012-10-17"
+        }
+    )
+    rotation_period_in_days            = 365
+    tags                               = {
+        "Environment" = "dev"
+        "ManagedBy"   = "Terraform"
+        "Module"      = "security"
+        "Name"        = "nextcloud-dev-main-kms"
+        "Project"     = "nextcloud"
+    }
+    tags_all                           = {
+        "Environment" = "dev"
+        "ManagedBy"   = "Terraform"
+        "Module"      = "security"
+        "Name"        = "nextcloud-dev-main-kms"
+        "Project"     = "nextcloud"
+    }
+}
+
+# module.security.aws_secretsmanager_secret.admin_password:
+resource "aws_secretsmanager_secret" "admin_password" {
+    arn                            = "arn:aws:secretsmanager:eu-west-3:039497794217:secret:nextcloud-dev/nextcloud/admin-password-8tTkXJ"
+    description                    = "Password admin Nextcloud initial"
+    force_overwrite_replica_secret = false
+    id                             = "arn:aws:secretsmanager:eu-west-3:039497794217:secret:nextcloud-dev/nextcloud/admin-password-8tTkXJ"
+    kms_key_id                     = "arn:aws:kms:eu-west-3:039497794217:key/c5442131-30be-4cf8-a017-30848a555274"
+    name                           = "nextcloud-dev/nextcloud/admin-password"
+    recovery_window_in_days        = 0
+    tags                           = {
+        "Environment" = "dev"
+        "ManagedBy"   = "Terraform"
+        "Module"      = "security"
+        "Name"        = "nextcloud-dev-admin-password"
+        "Project"     = "nextcloud"
+    }
+    tags_all                       = {
+        "Environment" = "dev"
+        "ManagedBy"   = "Terraform"
+        "Module"      = "security"
+        "Name"        = "nextcloud-dev-admin-password"
+        "Project"     = "nextcloud"
+    }
+}
+
+# module.security.aws_secretsmanager_secret.db_password:
+resource "aws_secretsmanager_secret" "db_password" {
+    arn                            = "arn:aws:secretsmanager:eu-west-3:039497794217:secret:nextcloud-dev/db/password-6Kv9aR"
+    description                    = "Password PostgreSQL pour Nextcloud"
+    force_overwrite_replica_secret = false
+    id                             = "arn:aws:secretsmanager:eu-west-3:039497794217:secret:nextcloud-dev/db/password-6Kv9aR"
+    kms_key_id                     = "arn:aws:kms:eu-west-3:039497794217:key/c5442131-30be-4cf8-a017-30848a555274"
+    name                           = "nextcloud-dev/db/password"
+    recovery_window_in_days        = 0
+    tags                           = {
+        "Environment" = "dev"
+        "ManagedBy"   = "Terraform"
+        "Module"      = "security"
+        "Name"        = "nextcloud-dev-db-password"
+        "Project"     = "nextcloud"
+    }
+    tags_all                       = {
+        "Environment" = "dev"
+        "ManagedBy"   = "Terraform"
+        "Module"      = "security"
+        "Name"        = "nextcloud-dev-db-password"
+        "Project"     = "nextcloud"
+    }
+}
+
+# module.security.aws_secretsmanager_secret_version.admin_password:
+resource "aws_secretsmanager_secret_version" "admin_password" {
+    arn            = "arn:aws:secretsmanager:eu-west-3:039497794217:secret:nextcloud-dev/nextcloud/admin-password-8tTkXJ"
+    id             = "arn:aws:secretsmanager:eu-west-3:039497794217:secret:nextcloud-dev/nextcloud/admin-password-8tTkXJ|terraform-20260612120950263900000008"
+    secret_id      = "arn:aws:secretsmanager:eu-west-3:039497794217:secret:nextcloud-dev/nextcloud/admin-password-8tTkXJ"
+    secret_string  = (sensitive value)
+    version_id     = "terraform-20260612120950263900000008"
+    version_stages = [
+        "AWSCURRENT",
+    ]
+}
+
+# module.security.aws_secretsmanager_secret_version.db_password:
+resource "aws_secretsmanager_secret_version" "db_password" {
+    arn            = "arn:aws:secretsmanager:eu-west-3:039497794217:secret:nextcloud-dev/db/password-6Kv9aR"
+    id             = "arn:aws:secretsmanager:eu-west-3:039497794217:secret:nextcloud-dev/db/password-6Kv9aR|terraform-20260612120950257200000007"
+    secret_id      = "arn:aws:secretsmanager:eu-west-3:039497794217:secret:nextcloud-dev/db/password-6Kv9aR"
+    secret_string  = (sensitive value)
+    version_id     = "terraform-20260612120950257200000007"
+    version_stages = [
+        "AWSCURRENT",
+    ]
+}
+
+# module.security.aws_security_group.alb:
+resource "aws_security_group" "alb" {
+    arn                    = "arn:aws:ec2:eu-west-3:039497794217:security-group/sg-08036a35c8f3a5323"
+    description            = "SG pour l ALB public Nextcloud"
+    egress                 = [
+        {
+            cidr_blocks      = [
+                "0.0.0.0/0",
+            ]
+            description      = "Allow all egress"
+            from_port        = 0
+            ipv6_cidr_blocks = []
+            prefix_list_ids  = []
+            protocol         = "-1"
+            security_groups  = []
+            self             = false
+            to_port          = 0
+        },
+    ]
+    id                     = "sg-08036a35c8f3a5323"
+    ingress                = [
+        {
+            cidr_blocks      = [
+                "0.0.0.0/0",
+            ]
+            description      = "HTTP from Internet redirect to HTTPS"
+            from_port        = 80
+            ipv6_cidr_blocks = []
+            prefix_list_ids  = []
+            protocol         = "tcp"
+            security_groups  = []
+            self             = false
+            to_port          = 80
+        },
+        {
+            cidr_blocks      = [
+                "0.0.0.0/0",
+            ]
+            description      = "HTTPS from Internet"
+            from_port        = 443
+            ipv6_cidr_blocks = []
+            prefix_list_ids  = []
+            protocol         = "tcp"
+            security_groups  = []
+            self             = false
+            to_port          = 443
+        },
+    ]
+    name                   = "nextcloud-dev-alb"
+    owner_id               = "039497794217"
+    revoke_rules_on_delete = false
+    tags                   = {
+        "Environment" = "dev"
+        "ManagedBy"   = "Terraform"
+        "Module"      = "security"
+        "Name"        = "nextcloud-dev-alb"
+        "Project"     = "nextcloud"
+    }
+    tags_all               = {
+        "Environment" = "dev"
+        "ManagedBy"   = "Terraform"
+        "Module"      = "security"
+        "Name"        = "nextcloud-dev-alb"
+        "Project"     = "nextcloud"
+    }
+    vpc_id                 = "vpc-09aed281b6aa94ced"
+}
+
+# module.security.aws_security_group.app:
+resource "aws_security_group" "app" {
+    arn                    = "arn:aws:ec2:eu-west-3:039497794217:security-group/sg-01fe5e208d95f241a"
+    description            = "SG pour les EC2 Nextcloud derriere l ALB"
+    egress                 = [
+        {
+            cidr_blocks      = [
+                "0.0.0.0/0",
+            ]
+            description      = "Allow all egress"
+            from_port        = 0
+            ipv6_cidr_blocks = []
+            prefix_list_ids  = []
+            protocol         = "-1"
+            security_groups  = []
+            self             = false
+            to_port          = 0
+        },
+    ]
+    id                     = "sg-01fe5e208d95f241a"
+    ingress                = [
+        {
+            cidr_blocks      = []
+            description      = "HTTP from ALB only"
+            from_port        = 80
+            ipv6_cidr_blocks = []
+            prefix_list_ids  = []
+            protocol         = "tcp"
+            security_groups  = [
+                "sg-08036a35c8f3a5323",
+            ]
+            self             = false
+            to_port          = 80
+        },
+    ]
+    name                   = "nextcloud-dev-app"
+    owner_id               = "039497794217"
+    revoke_rules_on_delete = false
+    tags                   = {
+        "Environment" = "dev"
+        "ManagedBy"   = "Terraform"
+        "Module"      = "security"
+        "Name"        = "nextcloud-dev-app"
+        "Project"     = "nextcloud"
+    }
+    tags_all               = {
+        "Environment" = "dev"
+        "ManagedBy"   = "Terraform"
+        "Module"      = "security"
+        "Name"        = "nextcloud-dev-app"
+        "Project"     = "nextcloud"
+    }
+    vpc_id                 = "vpc-09aed281b6aa94ced"
+}
+
+# module.security.aws_security_group.db:
+resource "aws_security_group" "db" {
+    arn                    = "arn:aws:ec2:eu-west-3:039497794217:security-group/sg-05e97be300ccdb875"
+    description            = "SG pour RDS PostgreSQL Nextcloud"
+    egress                 = [
+        {
+            cidr_blocks      = [
+                "10.30.0.0/16",
+            ]
+            description      = "Minimal egress within VPC"
+            from_port        = 0
+            ipv6_cidr_blocks = []
+            prefix_list_ids  = []
+            protocol         = "-1"
+            security_groups  = []
+            self             = false
+            to_port          = 0
+        },
+    ]
+    id                     = "sg-05e97be300ccdb875"
+    ingress                = [
+        {
+            cidr_blocks      = []
+            description      = "PostgreSQL from app only"
+            from_port        = 5432
+            ipv6_cidr_blocks = []
+            prefix_list_ids  = []
+            protocol         = "tcp"
+            security_groups  = [
+                "sg-01fe5e208d95f241a",
+            ]
+            self             = false
+            to_port          = 5432
+        },
+    ]
+    name                   = "nextcloud-dev-db"
+    owner_id               = "039497794217"
+    revoke_rules_on_delete = false
+    tags                   = {
+        "Environment" = "dev"
+        "ManagedBy"   = "Terraform"
+        "Module"      = "security"
+        "Name"        = "nextcloud-dev-db"
+        "Project"     = "nextcloud"
+    }
+    tags_all               = {
+        "Environment" = "dev"
+        "ManagedBy"   = "Terraform"
+        "Module"      = "security"
+        "Name"        = "nextcloud-dev-db"
+        "Project"     = "nextcloud"
+    }
+    vpc_id                 = "vpc-09aed281b6aa94ced"
+}
+
+# module.security.aws_vpc_security_group_egress_rule.alb_all:
+resource "aws_vpc_security_group_egress_rule" "alb_all" {
+    arn                    = "arn:aws:ec2:eu-west-3:039497794217:security-group-rule/sgr-0e8241502e3b97334"
+    cidr_ipv4              = "0.0.0.0/0"
+    description            = "Allow all egress"
+    id                     = "sgr-0e8241502e3b97334"
+    ip_protocol            = "-1"
+    security_group_id      = "sg-08036a35c8f3a5323"
+    security_group_rule_id = "sgr-0e8241502e3b97334"
+    tags_all               = {}
+}
+
+# module.security.aws_vpc_security_group_egress_rule.app_all:
+resource "aws_vpc_security_group_egress_rule" "app_all" {
+    arn                    = "arn:aws:ec2:eu-west-3:039497794217:security-group-rule/sgr-09b9a1b6539ed2485"
+    cidr_ipv4              = "0.0.0.0/0"
+    description            = "Allow all egress"
+    id                     = "sgr-09b9a1b6539ed2485"
+    ip_protocol            = "-1"
+    security_group_id      = "sg-01fe5e208d95f241a"
+    security_group_rule_id = "sgr-09b9a1b6539ed2485"
+    tags_all               = {}
+}
+
+# module.security.aws_vpc_security_group_egress_rule.db_minimal:
+resource "aws_vpc_security_group_egress_rule" "db_minimal" {
+    arn                    = "arn:aws:ec2:eu-west-3:039497794217:security-group-rule/sgr-039cd646d26404d0d"
+    cidr_ipv4              = "10.30.0.0/16"
+    description            = "Minimal egress within VPC"
+    id                     = "sgr-039cd646d26404d0d"
+    ip_protocol            = "-1"
+    security_group_id      = "sg-05e97be300ccdb875"
+    security_group_rule_id = "sgr-039cd646d26404d0d"
+    tags_all               = {}
+}
+
+# module.security.aws_vpc_security_group_ingress_rule.alb_http_redirect:
+resource "aws_vpc_security_group_ingress_rule" "alb_http_redirect" {
+    arn                    = "arn:aws:ec2:eu-west-3:039497794217:security-group-rule/sgr-0d10dfd2177634868"
+    cidr_ipv4              = "0.0.0.0/0"
+    description            = "HTTP from Internet redirect to HTTPS"
+    from_port              = 80
+    id                     = "sgr-0d10dfd2177634868"
+    ip_protocol            = "tcp"
+    security_group_id      = "sg-08036a35c8f3a5323"
+    security_group_rule_id = "sgr-0d10dfd2177634868"
+    tags_all               = {}
+    to_port                = 80
+}
+
+# module.security.aws_vpc_security_group_ingress_rule.alb_https:
+resource "aws_vpc_security_group_ingress_rule" "alb_https" {
+    arn                    = "arn:aws:ec2:eu-west-3:039497794217:security-group-rule/sgr-0655ea26c49e7c096"
+    cidr_ipv4              = "0.0.0.0/0"
+    description            = "HTTPS from Internet"
+    from_port              = 443
+    id                     = "sgr-0655ea26c49e7c096"
+    ip_protocol            = "tcp"
+    security_group_id      = "sg-08036a35c8f3a5323"
+    security_group_rule_id = "sgr-0655ea26c49e7c096"
+    tags_all               = {}
+    to_port                = 443
+}
+
+# module.security.aws_vpc_security_group_ingress_rule.app_http_from_alb:
+resource "aws_vpc_security_group_ingress_rule" "app_http_from_alb" {
+    arn                          = "arn:aws:ec2:eu-west-3:039497794217:security-group-rule/sgr-0cc9481c1859558ff"
+    description                  = "HTTP from ALB only"
+    from_port                    = 80
+    id                           = "sgr-0cc9481c1859558ff"
+    ip_protocol                  = "tcp"
+    referenced_security_group_id = "sg-08036a35c8f3a5323"
+    security_group_id            = "sg-01fe5e208d95f241a"
+    security_group_rule_id       = "sgr-0cc9481c1859558ff"
+    tags_all                     = {}
+    to_port                      = 80
+}
+
+# module.security.aws_vpc_security_group_ingress_rule.db_pg_from_app:
+resource "aws_vpc_security_group_ingress_rule" "db_pg_from_app" {
+    arn                          = "arn:aws:ec2:eu-west-3:039497794217:security-group-rule/sgr-0da53d06d61484619"
+    description                  = "PostgreSQL from app only"
+    from_port                    = 5432
+    id                           = "sgr-0da53d06d61484619"
+    ip_protocol                  = "tcp"
+    referenced_security_group_id = "sg-01fe5e208d95f241a"
+    security_group_id            = "sg-05e97be300ccdb875"
+    security_group_rule_id       = "sgr-0da53d06d61484619"
+    tags_all                     = {}
+    to_port                      = 5432
+}
+
+# module.security.random_password.admin:
+resource "random_password" "admin" {
+    bcrypt_hash      = (sensitive value)
+    id               = "none"
+    length           = 20
+    lower            = true
+    min_lower        = 0
+    min_numeric      = 0
+    min_special      = 0
+    min_upper        = 0
+    number           = true
+    numeric          = true
+    override_special = "!@#%^&*()-_=+"
+    result           = (sensitive value)
+    special          = true
+    upper            = true
+}
+
+# module.security.random_password.db:
+resource "random_password" "db" {
+    bcrypt_hash = (sensitive value)
+    id          = "none"
+    length      = 24
+    lower       = true
+    min_lower   = 0
+    min_numeric = 0
+    min_special = 0
+    min_upper   = 0
+    number      = true
+    numeric     = true
+    result      = (sensitive value)
+    special     = false
+    upper       = true
+}

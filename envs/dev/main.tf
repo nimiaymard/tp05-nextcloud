@@ -23,7 +23,7 @@ module "data" {
   db_security_group_id   = module.security.db_security_group_id
   kms_key_arn            = module.security.kms_key_arn
   db_password_secret_arn = module.security.db_password_secret_arn
-  depends_on = [module.security]
+  depends_on             = [module.security]
 }
 
 module "compute" {
@@ -45,24 +45,51 @@ module "compute" {
   admin_password_secret_arn = module.security.admin_password_secret_arn
 }
 resource "aws_iam_role_policy" "app_s3_real" {
-  name   = "nextcloud-dev-app-s3-real"
-  role   = module.security.app_iam_role_arn
+  name = "nextcloud-dev-app-s3-real"
+  role = "nextcloud-dev-app"
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
-        Sid    = "NextcloudS3Objects"
-        Effect = "Allow"
-        Action = ["s3:GetObject","s3:PutObject","s3:DeleteObject","s3:GetObjectVersion","s3:AbortMultipartUpload"]
+        Sid      = "NextcloudS3Objects"
+        Effect   = "Allow"
+        Action   = ["s3:GetObject", "s3:PutObject", "s3:DeleteObject", "s3:GetObjectVersion", "s3:AbortMultipartUpload"]
         Resource = "${module.data.s3_primary_bucket_arn}/*"
       },
       {
-        Sid    = "NextcloudS3Bucket"
-        Effect = "Allow"
-        Action = ["s3:ListBucket","s3:GetBucketLocation","s3:ListBucketMultipartUploads"]
+        Sid      = "NextcloudS3Bucket"
+        Effect   = "Allow"
+        Action   = ["s3:ListBucket", "s3:GetBucketLocation", "s3:ListBucketMultipartUploads"]
         Resource = module.data.s3_primary_bucket_arn
       }
     ]
   })
   depends_on = [module.security, module.data]
+}
+# Outputs utiles pour le rendu
+output "vpc_id" {
+  value = module.networking.vpc_id
+}
+
+output "alb_dns_name" {
+  value = module.compute.alb_dns_name
+}
+
+output "db_endpoint" {
+  value = module.data.db_endpoint
+}
+
+output "s3_primary_bucket_name" {
+  value = module.data.s3_primary_bucket_name
+}
+
+output "s3_logs_bucket_name" {
+  value = module.data.s3_logs_bucket_name
+}
+
+output "kms_key_arn" {
+  value = module.security.kms_key_arn
+}
+output "nextcloud_url" {
+  value = module.compute.nextcloud_url
 }
