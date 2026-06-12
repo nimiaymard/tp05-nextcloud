@@ -50,5 +50,5 @@ variable "db_max_allocated_storage" {
 
 variable "db_engine_version" {
   type    = string
-  default = "16.4"
+  default = "16.9"
 }
