@@ -14,7 +14,8 @@ resource "aws_lb" "main" {
   access_logs {
     bucket  = var.s3_logs_bucket_name
     prefix  = "alb"
-    enabled = true
+    enabled = false
+
   }
 
   tags = merge(local.common_tags, {
