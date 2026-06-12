@@ -10,8 +10,9 @@ module "security" {
   environment           = var.environment
   vpc_id                = module.networking.vpc_id
   vpc_cidr              = module.networking.vpc_cidr
-  s3_primary_bucket_arn = "arn:aws:s3:::placeholder"
-  s3_logs_bucket_arn    = "arn:aws:s3:::placeholder"
+  s3_primary_bucket_arn = module.data.s3_primary_bucket_arn
+  s3_logs_bucket_arn    = module.data.s3_logs_bucket_arn
+  depends_on            = [module.data]
 }
 
 module "data" {
