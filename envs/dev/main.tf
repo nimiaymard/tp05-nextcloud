@@ -10,9 +10,8 @@ module "security" {
   environment           = var.environment
   vpc_id                = module.networking.vpc_id
   vpc_cidr              = module.networking.vpc_cidr
-  s3_primary_bucket_arn = module.data.s3_primary_bucket_arn
-  s3_logs_bucket_arn    = module.data.s3_logs_bucket_arn
-  depends_on            = [module.data]
+  s3_primary_bucket_arn = "arn:aws:s3:::placeholder"
+  s3_logs_bucket_arn    = "arn:aws:s3:::placeholder"
 }
 
 module "data" {
@@ -44,4 +43,26 @@ module "compute" {
   s3_logs_bucket_name       = module.data.s3_logs_bucket_name
   db_password_secret_arn    = module.security.db_password_secret_arn
   admin_password_secret_arn = module.security.admin_password_secret_arn
+}
+resource "aws_iam_role_policy" "app_s3_real" {
+  name   = "nextcloud-dev-app-s3-real"
+  role   = module.security.app_iam_role_arn
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "NextcloudS3Objects"
+        Effect = "Allow"
+        Action = ["s3:GetObject","s3:PutObject","s3:DeleteObject","s3:GetObjectVersion","s3:AbortMultipartUpload"]
+        Resource = "${module.data.s3_primary_bucket_arn}/*"
+      },
+      {
+        Sid    = "NextcloudS3Bucket"
+        Effect = "Allow"
+        Action = ["s3:ListBucket","s3:GetBucketLocation","s3:ListBucketMultipartUploads"]
+        Resource = module.data.s3_primary_bucket_arn
+      }
+    ]
+  })
+  depends_on = [module.security, module.data]
 }
