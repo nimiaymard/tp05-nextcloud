@@ -1,5 +1,6 @@
 data "aws_secretsmanager_secret_version" "db_password" {
   secret_id = var.db_password_secret_arn
+  depends_on = [var.db_password_secret_arn]
 }
 
 resource "aws_db_subnet_group" "nextcloud" {

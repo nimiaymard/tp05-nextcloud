@@ -23,6 +23,7 @@ module "data" {
   db_security_group_id   = module.security.db_security_group_id
   kms_key_arn            = module.security.kms_key_arn
   db_password_secret_arn = module.security.db_password_secret_arn
+  depends_on = [module.security]
 }
 
 module "compute" {
@@ -39,6 +40,7 @@ module "compute" {
   db_name                   = module.data.db_name
   db_username               = module.data.db_username
   s3_primary_bucket_name    = module.data.s3_primary_bucket_name
+  s3_logs_bucket_name       = module.data.s3_logs_bucket_name
   db_password_secret_arn    = module.security.db_password_secret_arn
   admin_password_secret_arn = module.security.admin_password_secret_arn
 }
