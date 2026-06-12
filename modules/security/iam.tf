@@ -19,6 +19,7 @@ data "aws_iam_policy_document" "app_assume_role" {
 resource "aws_iam_role" "app" {
   name               = "${local.name_prefix}-app"
   description        = "Role runtime pour EC2 Nextcloud"
+  permissions_boundary = "arn:aws:iam::039497794217:policy/formation-permissions-boundary-paris"
   assume_role_policy = data.aws_iam_policy_document.app_assume_role.json
 
   tags = merge(local.common_tags, {
